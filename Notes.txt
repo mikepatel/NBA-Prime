@@ -1,0 +1,18 @@
+- Gathering my own data via web scraping
+- Communication => Visualization (Jupyter Notebook)
+- HitP tie-in
+
+# Dataset
+- Basketball-Reference "https://www.basketball-reference.com/"
+- unstructured?
+- determine the greatest basketball play of all time (images) then recreate (GANs)
+    - text 2 image GAN, recreate/re-enact/re-animate basketball sequences for podcast video
+- BeautifulSoup4.7.1
+    - prettify()
+- csv, api
+- use data from Internet
+
+- create image dataset of my top 5 players
+- create ML model and app that identifies if player is in top 5
+    - if Yes, identify ranking
+    - if No, display funny message
