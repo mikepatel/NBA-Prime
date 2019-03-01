@@ -21,13 +21,73 @@ with urllib.request.urlopen(url) as response:
     data = response.read()
 
 soup = BeautifulSoup(data, "html.parser")
+print(soup.title.text.strip())
 
 # find "Per Game" table
 table = soup.find("table", id="per_game")  # find() = find a specific vs find_all()
 table_body = table.find("tbody")
 rows = table_body.find_all("tr")
 
+CAREER_STATS = {}
+SEASONS = []
+PPG = []
+APG = []
+RPG = []
 
+for row in rows:
+    try:
+        # find season feature, season feature acts as dictionary key
+        season = row.find("th", {"data-stat": "season"})
+        season = season.a  # get URL
+        season = season.text.strip()
+
+        # find ppg feature (points)
+        ppg = float(row.find("td", {"data-stat": "pts_per_g"}).text.strip())
+
+        # find rpg feature (rebounds)
+        rpg = float(row.find("td", {"data-stat": "trb_per_g"}).text.strip())
+
+        # find apg feature (assists)
+        apg = float(row.find("td", {"data-stat": "ast_per_g"}).text.strip())
+
+        SEASONS.append(season)
+        PPG.append(ppg)
+        RPG.append(rpg)
+        APG.append(apg)
+
+    except AttributeError:
+        continue
+
+CAREER_STATS["season"] = SEASONS
+CAREER_STATS["ppg"] = PPG
+CAREER_STATS["rpg"] = RPG
+CAREER_STATS["apg"] = APG
+
+
+def get_prime(stat, window_size):
+    value = 0.0
+    idx = 0
+
+    for i in range(len(CAREER_STATS[stat])+1-window_size):
+        avg = np.mean(CAREER_STATS[stat][i: i+window_size])
+
+        if avg > value:
+            value = avg
+            idx = i
+
+    seasons = SEASONS[idx: idx+window_size]
+
+    return seasons, value
+
+
+SLIDE_WINDOW_SIZE = 4
+STAT = "ppg"
+years, stat_value = get_prime(STAT, SLIDE_WINDOW_SIZE)
+years = ", ".join(years)
+print("\n{} year prime: {}".format(SLIDE_WINDOW_SIZE, years))
+print("{}: {:.4f}\n".format(STAT.upper(), stat_value))
+
+'''
 CAREER_STATS = []
 
 for row in rows:
@@ -46,6 +106,7 @@ for row in rows:
         # find apg feature (assists)
         apg = float(row.find("td", {"data-stat": "ast_per_g"}).text.strip())
 
+        #
         CAREER_STATS.append({"season": season,
                              "pts_per_g": ppg,
                              "trb_per_g": rpg,
@@ -81,10 +142,12 @@ def get_prime(stats_list, slide_window, stat):
 
 
 SLIDE_WINDOW = 3  # number of prime years parameter
-STAT = "pts_per_g"
+STAT = "ast_per_g"
 prime, value = get_prime(CAREER_STATS, SLIDE_WINDOW, STAT)
-print("\nPrime years: {}".format(prime))
-print("{}: {}\n".format(STAT.upper(), value))
+prime = ", ".join(prime)  # concatenate items in list
+print("\n{} prime years: {}".format(SLIDE_WINDOW, prime))
+print("{}: {:.4f}\n".format(STAT.upper(), value))
+'''
 
 
 ################################################################################
