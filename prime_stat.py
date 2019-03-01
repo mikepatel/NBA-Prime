@@ -65,6 +65,22 @@ class Player:
                 # find apg feature (assists)
                 apg = float(row.find("td", {"data-stat": "ast_per_g"}).text.strip())
 
+                # steals
+
+                # blocks
+
+                # turnovers
+
+                # FG %
+
+                # 3pt %
+
+                # free throws %
+
+                # free throws attempted
+
+                # minutes per game
+
                 self.SEASONS.append(season)
                 self.PPG.append(ppg)
                 self.RPG.append(rpg)
@@ -101,7 +117,6 @@ years, stat_value = p.get_prime(STAT, SLIDE_WINDOW_SIZE)
 years = ", ".join(years)
 print("\n{} prime years: {}".format(SLIDE_WINDOW_SIZE, years))
 print("{}: {:.4f}\n".format(STAT.upper(), stat_value))
-
 
 ################################################################################
 players_file = os.path.join(os.getcwd(), "players list.csv")
