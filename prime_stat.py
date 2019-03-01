@@ -3,6 +3,7 @@
 #   - BeautifulSoup4
 #
 
+
 ################################################################################
 # IMPORTs
 from bs4 import BeautifulSoup
@@ -10,6 +11,7 @@ import urllib  # standard library
 import csv
 import os
 import numpy as np
+
 
 ################################################################################
 # website to crawl
@@ -20,29 +22,33 @@ url = "https://www.basketball-reference.com/players/j/jamesle01.html"
 with urllib.request.urlopen(url) as response:
     data = response.read()
 
-
-################################################################################
-
-
-
-
 soup = BeautifulSoup(data, "html.parser")
 print("\n------------------------------------------------------------------------")
 player_name = soup.title.text.strip()
 player_name, _ = player_name.split("Stats")
 player_name = player_name.strip()
 print(player_name)
-#
+
+
+################################################################################
 class Player:
     def __init__(self):
-        self.CAREER_STATS_REG = {}
-        self.CAREER_STATS_PLAYOFFS = {}
+        self.CAREER_STATS_REG = {}  # Regular Season
+        self.CAREER_STATS_PLAYOFFS = {}  # Playoffs
 
         # stat categories
-        self.SEASONS = []
-        self.PPG = []
-        self.APG = []
-        self.RPG = []
+        self.SEASONS = []  # year xxxx-xx
+        self.PPG = []  # points per
+        self.RPG = []  # rebounds per
+        self.APG = []  # assists per
+        self.STEALS = []  # steals per
+        self.BLOCKS = []  # blocks per
+        self.TURNOVERS = []  # turnovers per
+        self.FG_PERCENT = []  # FG% per
+        self.FG_3_PERCENT = []  # 3FG% per
+        self.FT = []  # made free throws per
+        self.FTA = []  # free throw attempts per
+        self.MPG = []  # minutes per
 
         # find "Per Game" table => Regular Season
         table = soup.find("table", id="per_game")  # find() = find a specific vs find_all()
@@ -115,8 +121,9 @@ STAT = "ppg"
 p = Player()
 years, stat_value = p.get_prime(STAT, SLIDE_WINDOW_SIZE)
 years = ", ".join(years)
-print("\n{} prime years: {}".format(SLIDE_WINDOW_SIZE, years))
-print("{}: {:.4f}\n".format(STAT.upper(), stat_value))
+print("\n{} year prime for {}: {}".format(SLIDE_WINDOW_SIZE, STAT.upper(), years))
+print("{}: {:.4f}".format(STAT.upper(), stat_value))
+print("\n------------------------------------------------------------------------")
 
 ################################################################################
 players_file = os.path.join(os.getcwd(), "players list.csv")
