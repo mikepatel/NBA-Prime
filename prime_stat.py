@@ -1,9 +1,15 @@
-# NOTES:
-#   - Python 3.6.5
-#   - BeautifulSoup4
-#
+"""
+Michael Patel
+February 2019
 
+version: Python 3.6.5
 
+File Description:
+
+Notes:
+    - BeautifulSoup4
+
+"""
 ################################################################################
 # IMPORTs
 from bs4 import BeautifulSoup
@@ -16,7 +22,7 @@ import numpy as np
 ################################################################################
 # website to crawl
 #url = "https://www.basketball-reference.com/"
-url = "https://www.basketball-reference.com/players/j/jamesle01.html"
+url = "https://www.basketball-reference.com/players/j/jamesle01.html"  # LeBron James
 #url = "https://www.basketball-reference.com/players/j/jordami01.html"
 
 with urllib.request.urlopen(url) as response:
