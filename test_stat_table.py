@@ -28,6 +28,9 @@ import re
 url = "https://www.basketball-reference.com/players/j/jamesle01.html"  # LeBron James
 #url = "https://www.basketball-reference.com/players/b/bryanko01.html"  # Kobe Bryant
 #url = "https://www.basketball-reference.com/players/d/duranke01.html"  # Kevin Durant
+#url = "https://www.basketball-reference.com/players/h/hardeja01.html"  # James Harden
+#url = "https://www.basketball-reference.com/players/c/curryst01.html"  # Steph Curry
+
 
 with urllib.request.urlopen(url) as response:
     data = response.read()
