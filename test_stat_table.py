@@ -10,6 +10,10 @@ Notes:
     - BeautifulSoup4
     - Basketball Reference
     - printout in table format
+    - use 'm_value' statistic for each season
+        - 'm_value' is constructed from a weighted combination of several statistics such as:
+            - points, rebounds, assists
+            - PER, true shooting, FT shooting
 
 """
 
@@ -23,6 +27,7 @@ import numpy as np
 from prettytable import PrettyTable
 import re
 
+
 ################################################################################
 # website to crawl
 url = "https://www.basketball-reference.com/players/j/jamesle01.html"  # LeBron James
@@ -30,17 +35,24 @@ url = "https://www.basketball-reference.com/players/j/jamesle01.html"  # LeBron 
 #url = "https://www.basketball-reference.com/players/d/duranke01.html"  # Kevin Durant
 #url = "https://www.basketball-reference.com/players/h/hardeja01.html"  # James Harden
 #url = "https://www.basketball-reference.com/players/c/curryst01.html"  # Steph Curry
+#url = "https://www.basketball-reference.com/players/w/wadedw01.html"  # Dwayne Wade
+#url = "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
 
 
 with urllib.request.urlopen(url) as response:
-    data = response.read()
+    page = response.read()
 
-soup = BeautifulSoup(re.sub("<!--|-->", "", str(data)), "html.parser")
+soup = BeautifulSoup(re.sub("<!--|-->", "", str(page)), "html.parser")
 print("\n------------------------------------------------------------------------")
-player_name = soup.title.text.strip()
-player_name, _ = player_name.split("Stats")
-player_name = player_name.strip()
-#print(player_name)
+
+
+# function that returns NBA player's name from Basketball Reference page
+def get_player_name():
+    name = soup.title.text.strip()
+    name, _ = name.split("Stats")
+    name = name.strip()
+    #print(name)
+    return name
 
 
 class Player:
@@ -70,6 +82,8 @@ class Player:
         self.TS = []  # true shooting % per
         self.USAGE = []  # usage % per
         self.PER = []  # player efficiency rating per
+
+        self.M_VALUE = []  # custom 'm_value' statistic
 
     #
     def get_prime(self, stats, stat_cat, window_size):
@@ -228,6 +242,7 @@ class Player:
 
 
 SLIDE_WINDOW_SIZE = 3
+player_name = get_player_name()
 print(player_name + "'s " + str(SLIDE_WINDOW_SIZE) + " year prime by stat category:")
 STATS = [
     {"Points Per Game": "ppg"},
