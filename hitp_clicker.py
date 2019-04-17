@@ -10,6 +10,7 @@ Notes:
     - chromedriver.exe (Chrome) is in '\AppData\Local\Programs\Python\Python36\Scripts' directory
     - geckodriver.exe (Firefox) is in '\AppData\Local\Programs\Python\Python36\Scripts' directory
     - SoundCloud API page: https://developers.soundcloud.com/docs/api/guide
+    - https://www.google.com/search?client=firefox-b-1-d&q=python+selenium+could+not+be+scrolled+into+view
 
 """
 
@@ -32,6 +33,7 @@ driver = webdriver.Firefox()
 driver.get(url)
 print(driver.title)
 time.sleep(1)
-element = driver.find_element_by_id("items").text
-print(element)
-driver.close()
+driver.find_element_by_id("items").click()
+
+#print(element.text)
+#driver.close()
