@@ -24,10 +24,17 @@ import urllib  # standard library
 import numpy as np
 from prettytable import PrettyTable
 import re
+import matplotlib.pyplot as plt
 
 
 ################################################################################
 url = "https://www.basketball-reference.com/players/j/jamesle01.html"  # LeBron James
+#url = "https://www.basketball-reference.com/players/b/bryanko01.html"  # Kobe Bryant
+#url = "https://www.basketball-reference.com/players/d/duranke01.html"  # Kevin Durant
+#url = "https://www.basketball-reference.com/players/h/hardeja01.html"  # James Harden
+#url = "https://www.basketball-reference.com/players/c/curryst01.html"  # Steph Curry
+#url = "https://www.basketball-reference.com/players/w/wadedw01.html"  # Dwayne Wade
+url = "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
 
 with urllib.request.urlopen(url) as response:
     page = response.read()
@@ -160,13 +167,13 @@ class Player:
                 continue  # for now
 
         # calculate m_value per each season
-        # weight values range 0 to 1
-        w1 = 0.025  # points
-        w2 = 0.1  # rebounds
-        w3 = 0.1  # assists
-        w4 = 0.3 * 10.0  # FT percentage
-        w5 = 0.025  # PER
-        w6 = 0.3 * 10.0  # TS
+        # weight values
+        w1 = 0.1 / 36.0  # points
+        w2 = 0.1 / 10.0  # rebounds
+        w3 = 0.1 / 10.0  # assists
+        w4 = 0.1  # FT percentage
+        w5 = 0.1 / 48.0  # PER
+        w6 = 0.1  # TS
 
         for i in range(len(self.SEASONS)):
             m_value = np.sum([
@@ -210,5 +217,57 @@ if __name__ == "__main__":
     prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
     for i in range(len(seasons)):
         prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
+    print("\n" + name + " " + str(WINDOW_SIZE) + "-year prime")
     print(prime_table)
+
+    # PLOTS
+    # Points
+    plt.subplot(2, 3, 1)
+    plt.plot(p.SEASONS, p.PPG)
+    plt.title("Points")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # Rebounds
+    plt.subplot(2, 3, 2)
+    plt.plot(p.SEASONS, p.RPG)
+    plt.title("Rebounds")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # Assists
+    plt.subplot(2, 3, 3)
+    plt.plot(p.SEASONS, p.APG)
+    plt.title("Assists")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # FT %
+    plt.subplot(2, 3, 4)
+    plt.plot(p.SEASONS, p.FT_PERCENT)
+    plt.title("FT %")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # PER
+    plt.subplot(2, 3, 5)
+    plt.plot(p.SEASONS, p.PER)
+    plt.title("PER")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # TS%
+    plt.subplot(2, 3, 6)
+    plt.plot(p.SEASONS, p.TS)
+    plt.title("TS %")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    plt.show()
 
