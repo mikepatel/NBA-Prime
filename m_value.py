@@ -16,6 +16,7 @@ Notes:
     - !! CONCERNED WITH JUST REGULAR SEASON !!
     - perform feature scaling (0/1 normalization) on stats before computing m_value
     - How best to store all stats data? How to pipe into model?
+    - How much does 'consistency' matter for a player's prime?
 
 """
 
@@ -31,10 +32,10 @@ import matplotlib.pyplot as plt
 
 ################################################################################
 url = "https://www.basketball-reference.com/players/j/jamesle01.html"  # LeBron James
-#url = "https://www.basketball-reference.com/players/b/bryanko01.html"  # Kobe Bryant
-#url = "https://www.basketball-reference.com/players/d/duranke01.html"  # Kevin Durant
-#url = "https://www.basketball-reference.com/players/h/hardeja01.html"  # James Harden
-#url = "https://www.basketball-reference.com/players/c/curryst01.html"  # Steph Curry
+url = "https://www.basketball-reference.com/players/b/bryanko01.html"  # Kobe Bryant
+url = "https://www.basketball-reference.com/players/d/duranke01.html"  # Kevin Durant
+url = "https://www.basketball-reference.com/players/h/hardeja01.html"  # James Harden
+url = "https://www.basketball-reference.com/players/c/curryst01.html"  # Steph Curry
 #url = "https://www.basketball-reference.com/players/w/wadedw01.html"  # Dwayne Wade
 #url = "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
 
@@ -78,11 +79,15 @@ class Player:
         idx = 0
 
         for i in range(len(self.M_VALUE)+1-window_size):
-            avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
+            temp_variance = np.var(self.M_VALUE[i: i+window_size])
+            print(i, temp_variance)
 
-            if avg_candidate > avg_value:
-                avg_value = avg_candidate
-                idx = i
+            if temp_variance < 0.0015:
+                avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
+
+                if avg_candidate > avg_value:
+                    avg_value = avg_candidate
+                    idx = i
 
         s = self.SEASONS[idx: idx+window_size]
         a = self.AGE[idx: idx+window_size]
