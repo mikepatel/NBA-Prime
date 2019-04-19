@@ -14,6 +14,8 @@ Notes:
             - PER, true shooting, FT shooting
             - !! winning awards (MVP, title, Finals MVP, etc.) should factor into calculation of m_value
     - !! CONCERNED WITH JUST REGULAR SEASON !!
+    - perform feature scaling (0/1 normalization) on stats before computing m_value
+    - How best to store all stats data? How to pipe into model?
 
 """
 
@@ -34,17 +36,19 @@ url = "https://www.basketball-reference.com/players/j/jamesle01.html"  # LeBron 
 #url = "https://www.basketball-reference.com/players/h/hardeja01.html"  # James Harden
 #url = "https://www.basketball-reference.com/players/c/curryst01.html"  # Steph Curry
 #url = "https://www.basketball-reference.com/players/w/wadedw01.html"  # Dwayne Wade
-url = "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
+#url = "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
 
-with urllib.request.urlopen(url) as response:
-    page = response.read()
 
-soup = BeautifulSoup(re.sub("<!--|-->", "", str(page)), "html.parser")
 print("\n------------------------------------------------------------------------")
 
 
 class Player:
     def __init__(self):
+        with urllib.request.urlopen(url) as response:
+            page = response.read()
+
+        self.soup = BeautifulSoup(re.sub("<!--|-->", "", str(page)), "html.parser")
+
         self.SEASONS = []  # year xxxx-xx
         self.AGE = []  # age at start of season
         self.TEAM = []  # NBA team
@@ -62,9 +66,8 @@ class Player:
         self.M_VALUE = []
 
     # return player's name
-    @staticmethod
-    def get_player_name():
-        name = soup.title.text.strip()
+    def get_name(self):
+        name = self.soup.title.text.strip()
         name, _ = name.split("Stats")
         name = name.strip()
         return name
@@ -98,7 +101,7 @@ class Player:
     def get_stats(self):
         # find "Per Game" table => Regular Season
         # 'Traditional' stats
-        table = soup.find("table", {"id": "per_game"})
+        table = self.soup.find("table", {"id": "per_game"})
         table_body = table.find("tbody")
         rows = table_body.find_all("tr")
 
@@ -135,17 +138,17 @@ class Player:
                 self.SEASONS.append(season)
                 self.AGE.append(age)
                 self.TEAM.append(team)
-                self.PPG.append(ppg)
-                self.RPG.append(rpg)
-                self.APG.append(apg)
-                self.FT_PERCENT.append(ft_pct)
+                self.PPG.append([ppg])
+                self.RPG.append([rpg])
+                self.APG.append([apg])
+                self.FT_PERCENT.append([ft_pct])
 
             except AttributeError:
                 continue  # for now
 
         # find "Advanced" table
         # 'Advanced' stats
-        table = soup.find("table", {"id": "advanced"})
+        table = self.soup.find("table", {"id": "advanced"})
         table_body = table.find("tbody")
         rows = table_body.find_all("tr")
 
@@ -160,46 +163,99 @@ class Player:
                 #print("TS: ", ts)
 
                 #
-                self.PER.append(per)
-                self.TS.append(ts)
+                self.PER.append([per])
+                self.TS.append([ts])
 
             except AttributeError:
                 continue  # for now
 
         # calculate m_value per each season
         # weight values
-        w1 = 0.1 / 36.0  # points
-        w2 = 0.1 / 10.0  # rebounds
-        w3 = 0.1 / 10.0  # assists
+        w1 = 0.1  # points
+        w2 = 0.1  # rebounds
+        w3 = 0.1  # assists
         w4 = 0.1  # FT percentage
-        w5 = 0.1 / 48.0  # PER
+        w5 = 0.1  # PER
         w6 = 0.1  # TS
+
+        # normalize
+        def normalize(stat):
+            stat_min = np.min(stat)
+            stat_max = np.max(stat)
+            den = stat_max - stat_min
+
+            for i in range(len(stat)):
+                num = stat[i][0] - stat_min
+                x = num / den
+                x = np.round(x, decimals=4)
+                stat[i].append(x)
+
+            return stat
+
+        self.PPG = normalize(self.PPG)
+        self.RPG = normalize(self.RPG)
+        self.APG = normalize(self.APG)
+        self.FT_PERCENT = normalize(self.FT_PERCENT)
+        self.PER = normalize(self.PER)
+        self.TS = normalize(self.TS)
 
         for i in range(len(self.SEASONS)):
             m_value = np.sum([
-                w1*self.PPG[i],
-                w2*self.RPG[i],
-                w3*self.APG[i],
-                w4*self.FT_PERCENT[i],
-                w5*self.PER[i],
-                w6*self.TS[i]
+                w1*self.PPG[i][1],
+                w2*self.RPG[i][1],
+                w3*self.APG[i][1],
+                w4*self.FT_PERCENT[i][1],
+                w5*self.PER[i][1],
+                w6*self.TS[i][1]
             ])
-            m_value = np.round(m_value, decimals=8)
+            m_value = np.round(m_value, decimals=4)
             self.M_VALUE.append(m_value)
 
 
 # Main
 if __name__ == "__main__":
     p = Player()
-    name = p.get_player_name()
+    name = p.get_name()
     print(name)
     p.get_stats()
 
     everything_table = PrettyTable()
-    everything_table.field_names = ["Year", "Age", "Team", "Points", "Rebounds", "Assists", "FT %", "PER", "TS", "M_VALUE"]
+    everything_table.field_names = [
+        "Year", "Age", "Team", "Points", "Rebounds",
+        "Assists", "FT %", "PER", "TS", "M_VALUE"
+    ]
     for i in range(len(p.SEASONS)):
-        everything_table.add_row([p.SEASONS[i], p.AGE[i], p.TEAM[i], p.PPG[i], p.RPG[i], p.APG[i], p.FT_PERCENT[i], p.PER[i], p.TS[i], p.M_VALUE[i]])
+        everything_table.add_row([
+            p.SEASONS[i],
+            p.AGE[i],
+            p.TEAM[i],
+            p.PPG[i][0],
+            p.RPG[i][0],
+            p.APG[i][0],
+            p.FT_PERCENT[i][0],
+            p.PER[i][0],
+            p.TS[i][0],
+            p.M_VALUE[i]])
     print(everything_table)
+
+    normalized_table = PrettyTable()
+    normalized_table.field_names = [
+        "Year", "Age", "Team", "Points", "Rebounds",
+        "Assists", "FT %", "PER", "TS", "M_VALUE"
+    ]
+    for i in range(len(p.SEASONS)):
+        normalized_table.add_row([
+            p.SEASONS[i],
+            p.AGE[i],
+            p.TEAM[i],
+            p.PPG[i][1],
+            p.RPG[i][1],
+            p.APG[i][1],
+            p.FT_PERCENT[i][1],
+            p.PER[i][1],
+            p.TS[i][1],
+            p.M_VALUE[i]])
+    print(normalized_table)
 
     """
     out_table = PrettyTable()
@@ -220,7 +276,10 @@ if __name__ == "__main__":
     print("\n" + name + " " + str(WINDOW_SIZE) + "-year prime")
     print(prime_table)
 
+    """
     # PLOTS
+    plt.suptitle(name)
+
     # Points
     plt.subplot(2, 3, 1)
     plt.plot(p.SEASONS, p.PPG)
@@ -270,4 +329,4 @@ if __name__ == "__main__":
     plt.grid()
 
     plt.show()
-
+    """
