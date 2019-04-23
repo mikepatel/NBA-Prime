@@ -20,6 +20,7 @@ Notes:
     - Can a player's prime include their first year on a team? (discounting injuries, suspensions, etc.)
         - How much does team chemistry factor into a player's prime?
         - What is the relationship (balance) between player and team successes that define a player's prime?
+    - make concurrent url requests => multiple threads
 
 """
 
@@ -32,6 +33,7 @@ import numpy as np
 from prettytable import PrettyTable
 import re
 import matplotlib.pyplot as plt
+import threading
 
 
 ################################################################################
@@ -205,6 +207,15 @@ class Player:
             self.M_VALUE.append(m_value)
 
 
+# Threading
+class myThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+
+    def run(self):
+        # what the thread should do when started
+
+
 # Main
 if __name__ == "__main__":
     URLS = [
@@ -217,6 +228,9 @@ if __name__ == "__main__":
         "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
     ]
 
+    # use threading for multiple urllib.requests
+    # create thread instance for each url in URLS
+
     for url in URLS:
         print("\n------------------------------------------------------------------------")
         p = Player(url)
@@ -224,6 +238,7 @@ if __name__ == "__main__":
         print(name)
         p.get_stats()
 
+        # Raw stats
         everything_table = PrettyTable()
         everything_table.field_names = [
             "Year", "Age", "Team", "Points", "Rebounds",
@@ -243,6 +258,7 @@ if __name__ == "__main__":
                 p.M_VALUE[i]])
         print(everything_table)
 
+        # Stats normalized
         normalized_table = PrettyTable()
         normalized_table.field_names = [
             "Year", "Age", "Team", "Points", "Rebounds",
@@ -278,6 +294,7 @@ if __name__ == "__main__":
         teams = p.TEAM[idx: idx+WINDOW_SIZE]
         m_values = p.M_VALUE[idx: idx+WINDOW_SIZE]
 
+        # Prime Window
         prime_table = PrettyTable()
         prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
         for i in range(len(seasons)):
