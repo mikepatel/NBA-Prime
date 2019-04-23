@@ -34,6 +34,7 @@ from prettytable import PrettyTable
 import re
 import matplotlib.pyplot as plt
 import threading
+import time
 
 
 ################################################################################
@@ -165,14 +166,6 @@ class Player:
                 continue  # for now
 
         # calculate m_value per each season
-        # weight values
-        w1 = 0.1  # points
-        w2 = 0.1  # rebounds
-        w3 = 0.1  # assists
-        w4 = 0.1  # FT percentage
-        w5 = 0.1  # PER
-        w6 = 0.1  # TS
-
         # normalize
         def normalize(stat):
             stat_min = np.min(stat)
@@ -194,6 +187,14 @@ class Player:
         self.PER = normalize(self.PER)
         self.TS = normalize(self.TS)
 
+        # weight values
+        w1 = 0.1  # points
+        w2 = 0.1  # rebounds
+        w3 = 0.1  # assists
+        w4 = 0.1  # FT percentage
+        w5 = 0.1  # PER
+        w6 = 0.1  # TS
+
         for i in range(len(self.SEASONS)):
             m_value = np.sum([
                 w1*self.PPG[i][1],
@@ -207,13 +208,76 @@ class Player:
             self.M_VALUE.append(m_value)
 
 
-# Threading
-class myThread(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
+def run_sim(url):
+    print("\n------------------------------------------------------------------------")
+    p = Player(url)
+    name = p.get_name()
+    print(name)
+    p.get_stats()
 
-    def run(self):
-        # what the thread should do when started
+    # Raw stats
+    everything_table = PrettyTable()
+    everything_table.field_names = [
+        "Year", "Age", "Team", "Points", "Rebounds",
+        "Assists", "FT %", "PER", "TS", "M_VALUE"
+    ]
+    for i in range(len(p.SEASONS)):
+        everything_table.add_row([
+            p.SEASONS[i],
+            p.AGE[i],
+            p.TEAM[i],
+            p.PPG[i][0],
+            p.RPG[i][0],
+            p.APG[i][0],
+            p.FT_PERCENT[i][0],
+            p.PER[i][0],
+            p.TS[i][0],
+            p.M_VALUE[i]])
+    print(everything_table)
+
+    # Stats normalized
+    normalized_table = PrettyTable()
+    normalized_table.field_names = [
+        "Year", "Age", "Team", "Points", "Rebounds",
+        "Assists", "FT %", "PER", "TS", "M_VALUE"
+    ]
+    for i in range(len(p.SEASONS)):
+        normalized_table.add_row([
+            p.SEASONS[i],
+            p.AGE[i],
+            p.TEAM[i],
+            p.PPG[i][1],
+            p.RPG[i][1],
+            p.APG[i][1],
+            p.FT_PERCENT[i][1],
+            p.PER[i][1],
+            p.TS[i][1],
+            p.M_VALUE[i]])
+    print(normalized_table)
+
+    """
+    out_table = PrettyTable()
+    out_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
+    for i in range(len(p.SEASONS)):
+        out_table.add_row([p.SEASONS[i], p.AGE[i], p.TEAM[i], p.M_VALUE[i]])
+    print(out_table)
+    """
+
+    # Window
+    WINDOW_SIZE = 3
+    idx = p.get_prime(window_size=WINDOW_SIZE)
+    seasons = p.SEASONS[idx: idx + WINDOW_SIZE]
+    ages = p.AGE[idx: idx + WINDOW_SIZE]
+    teams = p.TEAM[idx: idx + WINDOW_SIZE]
+    m_values = p.M_VALUE[idx: idx + WINDOW_SIZE]
+
+    # Prime Window
+    prime_table = PrettyTable()
+    prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
+    for i in range(len(seasons)):
+        prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
+    print("\n" + name + " " + str(WINDOW_SIZE) + "-year prime")
+    print(prime_table)
 
 
 # Main
@@ -227,82 +291,21 @@ if __name__ == "__main__":
         "https://www.basketball-reference.com/players/w/wadedw01.html",  # Dwayne Wade
         "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
     ]
+    start = time.time()
 
     # use threading for multiple urllib.requests
     # create thread instance for each url in URLS
+    threads = [threading.Thread(target=run_sim, args=(url,)) for url in URLS]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
 
-    for url in URLS:
-        print("\n------------------------------------------------------------------------")
-        p = Player(url)
-        name = p.get_name()
-        print(name)
-        p.get_stats()
+    finish = time.time()
+    duration = finish - start
+    print(str(duration))
 
-        # Raw stats
-        everything_table = PrettyTable()
-        everything_table.field_names = [
-            "Year", "Age", "Team", "Points", "Rebounds",
-            "Assists", "FT %", "PER", "TS", "M_VALUE"
-        ]
-        for i in range(len(p.SEASONS)):
-            everything_table.add_row([
-                p.SEASONS[i],
-                p.AGE[i],
-                p.TEAM[i],
-                p.PPG[i][0],
-                p.RPG[i][0],
-                p.APG[i][0],
-                p.FT_PERCENT[i][0],
-                p.PER[i][0],
-                p.TS[i][0],
-                p.M_VALUE[i]])
-        print(everything_table)
-
-        # Stats normalized
-        normalized_table = PrettyTable()
-        normalized_table.field_names = [
-            "Year", "Age", "Team", "Points", "Rebounds",
-            "Assists", "FT %", "PER", "TS", "M_VALUE"
-        ]
-        for i in range(len(p.SEASONS)):
-            normalized_table.add_row([
-                p.SEASONS[i],
-                p.AGE[i],
-                p.TEAM[i],
-                p.PPG[i][1],
-                p.RPG[i][1],
-                p.APG[i][1],
-                p.FT_PERCENT[i][1],
-                p.PER[i][1],
-                p.TS[i][1],
-                p.M_VALUE[i]])
-        print(normalized_table)
-
-        """
-        out_table = PrettyTable()
-        out_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
-        for i in range(len(p.SEASONS)):
-            out_table.add_row([p.SEASONS[i], p.AGE[i], p.TEAM[i], p.M_VALUE[i]])
-        print(out_table)
-        """
-
-        # Window
-        WINDOW_SIZE = 3
-        idx = p.get_prime(window_size=WINDOW_SIZE)
-        seasons = p.SEASONS[idx: idx+WINDOW_SIZE]
-        ages = p.AGE[idx: idx+WINDOW_SIZE]
-        teams = p.TEAM[idx: idx+WINDOW_SIZE]
-        m_values = p.M_VALUE[idx: idx+WINDOW_SIZE]
-
-        # Prime Window
-        prime_table = PrettyTable()
-        prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
-        for i in range(len(seasons)):
-            prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
-        print("\n" + name + " " + str(WINDOW_SIZE) + "-year prime")
-        print(prime_table)
-
-        """
+    """
         # PLOTS
         plt.suptitle(name)
     
@@ -355,4 +358,4 @@ if __name__ == "__main__":
         plt.grid()
     
         plt.show()
-        """
+    """
