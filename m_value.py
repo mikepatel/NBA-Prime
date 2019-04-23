@@ -82,12 +82,7 @@ class Player:
                     avg_value = avg_candidate
                     idx = i
 
-        s = self.SEASONS[idx: idx+window_size]
-        a = self.AGE[idx: idx+window_size]
-        t = self.TEAM[idx: idx+window_size]
-        m = self.M_VALUE[idx: idx+window_size]
-
-        return s, a, t, m
+        return idx  # return just the index
 
     #
     @staticmethod
@@ -277,7 +272,11 @@ if __name__ == "__main__":
 
         # Window
         WINDOW_SIZE = 3
-        seasons, ages, teams, m_values = p.get_prime(window_size=WINDOW_SIZE)
+        idx = p.get_prime(window_size=WINDOW_SIZE)
+        seasons = p.SEASONS[idx: idx+WINDOW_SIZE]
+        ages = p.AGE[idx: idx+WINDOW_SIZE]
+        teams = p.TEAM[idx: idx+WINDOW_SIZE]
+        m_values = p.M_VALUE[idx: idx+WINDOW_SIZE]
 
         prime_table = PrettyTable()
         prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
