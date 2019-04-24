@@ -16,7 +16,7 @@ Notes:
     - !! CONCERNED WITH JUST REGULAR SEASON !!
     - perform feature scaling (0/1 normalization) on stats before computing m_value
     - How best to store all stats data? How to pipe into model?
-    - How much does 'consistency' matter for a player's prime?
+    - How much does 'consistency' matter for a player's prime? => variance over prime window
     - Can a player's prime include their first year on a team? (discounting injuries, suspensions, etc.)
         - How much does team chemistry factor into a player's prime?
         - What is the relationship (balance) between player and team successes that define a player's prime?
@@ -62,7 +62,7 @@ class Player:
         # calculated for each season
         self.M_VALUE = []
 
-    # return player's name
+    # returns player's name
     def get_name(self):
         name = self.soup.title.text.strip()
         name, _ = name.split("Stats")
@@ -208,7 +208,7 @@ class Player:
             self.M_VALUE.append(m_value)
 
 
-# called by each thread, calculates players' primes
+# called by each thread, calculates players' primes and returns results in table format
 def run(url):
     break_line = "\n####################################################################################"
     p = Player(url)
@@ -362,7 +362,7 @@ if __name__ == "__main__":
 
     # use threading for multiple urllib.requests
     # create thread instance for each url in URLS
-    threads = [threading.Thread(target=run, args=(url,)) for url in URLS]
+    threads = [threading.Thread(target=run, args=(url,)) for url in URLS]  # comprehension
     for thread in threads:
         thread.start()
     for thread in threads:
