@@ -76,7 +76,7 @@ class Player:
 
         for i in range(len(self.M_VALUE)+1-window_size):
             temp_variance = np.var(self.M_VALUE[i: i+window_size])
-            print(i, temp_variance)
+            #print(i, temp_variance)
 
             if temp_variance < 0.0015:
                 avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
@@ -209,10 +209,10 @@ class Player:
 
 
 def run_sim(url):
-    print("\n------------------------------------------------------------------------")
+    break_line = "\n####################################################################################"
     p = Player(url)
     name = p.get_name()
-    print(name)
+    out_name = "\n" + name + "\n"
     p.get_stats()
 
     # Raw stats
@@ -233,7 +233,8 @@ def run_sim(url):
             p.PER[i][0],
             p.TS[i][0],
             p.M_VALUE[i]])
-    print(everything_table)
+
+    out_everything_table = "\nTraditional\n" + str(everything_table) + "\n"
 
     # Stats normalized
     normalized_table = PrettyTable()
@@ -253,7 +254,8 @@ def run_sim(url):
             p.PER[i][1],
             p.TS[i][1],
             p.M_VALUE[i]])
-    print(normalized_table)
+
+    out_normalized_table = "\nNormalized\n" + str(normalized_table) + "\n"
 
     """
     out_table = PrettyTable()
@@ -276,8 +278,75 @@ def run_sim(url):
     prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
     for i in range(len(seasons)):
         prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
-    print("\n" + name + " " + str(WINDOW_SIZE) + "-year prime")
-    print(prime_table)
+
+    table_title = "\n" + name + " " + str(WINDOW_SIZE) + "-year prime\n"
+    out_prime_table = table_title + str(prime_table) + "\n"
+
+    # print out at end
+    output = [
+        break_line,
+        out_name,
+        out_everything_table,
+        out_normalized_table,
+        out_prime_table
+    ]
+    output = "".join(output)
+    print(output)
+
+    """
+    # PLOTS
+    plt.suptitle(name)
+
+    # Points
+    plt.subplot(2, 3, 1)
+    plt.plot(p.SEASONS, p.PPG)
+    plt.title("Points")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # Rebounds
+    plt.subplot(2, 3, 2)
+    plt.plot(p.SEASONS, p.RPG)
+    plt.title("Rebounds")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # Assists
+    plt.subplot(2, 3, 3)
+    plt.plot(p.SEASONS, p.APG)
+    plt.title("Assists")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # FT %
+    plt.subplot(2, 3, 4)
+    plt.plot(p.SEASONS, p.FT_PERCENT)
+    plt.title("FT %")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # PER
+    plt.subplot(2, 3, 5)
+    plt.plot(p.SEASONS, p.PER)
+    plt.title("PER")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    # TS%
+    plt.subplot(2, 3, 6)
+    plt.plot(p.SEASONS, p.TS)
+    plt.title("TS %")
+    plt.xticks(rotation=45)
+    plt.subplots_adjust(hspace=0.5)
+    plt.grid()
+
+    plt.show()
+        """
 
 
 # Main
@@ -291,6 +360,7 @@ if __name__ == "__main__":
         "https://www.basketball-reference.com/players/w/wadedw01.html",  # Dwayne Wade
         "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
     ]
+
     start = time.time()
 
     # use threading for multiple urllib.requests
@@ -303,59 +373,5 @@ if __name__ == "__main__":
 
     finish = time.time()
     duration = finish - start
-    print(str(duration))
+    print("\nRuntime: {:.4f}".format(duration))
 
-    """
-        # PLOTS
-        plt.suptitle(name)
-    
-        # Points
-        plt.subplot(2, 3, 1)
-        plt.plot(p.SEASONS, p.PPG)
-        plt.title("Points")
-        plt.xticks(rotation=45)
-        plt.subplots_adjust(hspace=0.5)
-        plt.grid()
-    
-        # Rebounds
-        plt.subplot(2, 3, 2)
-        plt.plot(p.SEASONS, p.RPG)
-        plt.title("Rebounds")
-        plt.xticks(rotation=45)
-        plt.subplots_adjust(hspace=0.5)
-        plt.grid()
-    
-        # Assists
-        plt.subplot(2, 3, 3)
-        plt.plot(p.SEASONS, p.APG)
-        plt.title("Assists")
-        plt.xticks(rotation=45)
-        plt.subplots_adjust(hspace=0.5)
-        plt.grid()
-    
-        # FT %
-        plt.subplot(2, 3, 4)
-        plt.plot(p.SEASONS, p.FT_PERCENT)
-        plt.title("FT %")
-        plt.xticks(rotation=45)
-        plt.subplots_adjust(hspace=0.5)
-        plt.grid()
-    
-        # PER
-        plt.subplot(2, 3, 5)
-        plt.plot(p.SEASONS, p.PER)
-        plt.title("PER")
-        plt.xticks(rotation=45)
-        plt.subplots_adjust(hspace=0.5)
-        plt.grid()
-    
-        # TS%
-        plt.subplot(2, 3, 6)
-        plt.plot(p.SEASONS, p.TS)
-        plt.title("TS %")
-        plt.xticks(rotation=45)
-        plt.subplots_adjust(hspace=0.5)
-        plt.grid()
-    
-        plt.show()
-    """
