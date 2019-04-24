@@ -208,21 +208,26 @@ class Player:
             self.M_VALUE.append(m_value)
 
 
-def run_sim(url):
+# called by each thread, calculates players' primes
+def run(url):
     break_line = "\n####################################################################################"
     p = Player(url)
+
+    # Player name
     name = p.get_name()
     out_name = "\n" + name + "\n"
+
+    # Player stats
     p.get_stats()
 
-    # Raw stats
-    everything_table = PrettyTable()
-    everything_table.field_names = [
+    # Traditional stats
+    trad_table = PrettyTable()
+    trad_table.field_names = [
         "Year", "Age", "Team", "Points", "Rebounds",
         "Assists", "FT %", "PER", "TS", "M_VALUE"
     ]
     for i in range(len(p.SEASONS)):
-        everything_table.add_row([
+        trad_table.add_row([
             p.SEASONS[i],
             p.AGE[i],
             p.TEAM[i],
@@ -234,16 +239,16 @@ def run_sim(url):
             p.TS[i][0],
             p.M_VALUE[i]])
 
-    out_everything_table = "\nTraditional\n" + str(everything_table) + "\n"
+    out_trad_table = "\nTraditional\n" + str(trad_table) + "\n"
 
-    # Stats normalized
-    normalized_table = PrettyTable()
-    normalized_table.field_names = [
+    # Normalized stats
+    norm_table = PrettyTable()
+    norm_table.field_names = [
         "Year", "Age", "Team", "Points", "Rebounds",
         "Assists", "FT %", "PER", "TS", "M_VALUE"
     ]
     for i in range(len(p.SEASONS)):
-        normalized_table.add_row([
+        norm_table.add_row([
             p.SEASONS[i],
             p.AGE[i],
             p.TEAM[i],
@@ -255,25 +260,17 @@ def run_sim(url):
             p.TS[i][1],
             p.M_VALUE[i]])
 
-    out_normalized_table = "\nNormalized\n" + str(normalized_table) + "\n"
+    out_norm_table = "\nNormalized\n" + str(norm_table) + "\n"
 
-    """
-    out_table = PrettyTable()
-    out_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
-    for i in range(len(p.SEASONS)):
-        out_table.add_row([p.SEASONS[i], p.AGE[i], p.TEAM[i], p.M_VALUE[i]])
-    print(out_table)
-    """
-
-    # Window
+    # ?-year Prime stats
     WINDOW_SIZE = 3
     idx = p.get_prime(window_size=WINDOW_SIZE)
+
     seasons = p.SEASONS[idx: idx + WINDOW_SIZE]
     ages = p.AGE[idx: idx + WINDOW_SIZE]
     teams = p.TEAM[idx: idx + WINDOW_SIZE]
     m_values = p.M_VALUE[idx: idx + WINDOW_SIZE]
 
-    # Prime Window
     prime_table = PrettyTable()
     prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
     for i in range(len(seasons)):
@@ -282,12 +279,12 @@ def run_sim(url):
     table_title = "\n" + name + " " + str(WINDOW_SIZE) + "-year prime\n"
     out_prime_table = table_title + str(prime_table) + "\n"
 
-    # print out at end
+    # print out table results at end
     output = [
         break_line,
         out_name,
-        out_everything_table,
-        out_normalized_table,
+        out_trad_table,
+        out_norm_table,
         out_prime_table
     ]
     output = "".join(output)
@@ -346,11 +343,13 @@ def run_sim(url):
     plt.grid()
 
     plt.show()
-        """
+    """
 
 
 # Main
 if __name__ == "__main__":
+    start = time.time()
+
     URLS = [
         "https://www.basketball-reference.com/players/j/jamesle01.html",  # LeBron James
         "https://www.basketball-reference.com/players/b/bryanko01.html",  # Kobe Bryant
@@ -361,11 +360,9 @@ if __name__ == "__main__":
         "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
     ]
 
-    start = time.time()
-
     # use threading for multiple urllib.requests
     # create thread instance for each url in URLS
-    threads = [threading.Thread(target=run_sim, args=(url,)) for url in URLS]
+    threads = [threading.Thread(target=run, args=(url,)) for url in URLS]
     for thread in threads:
         thread.start()
     for thread in threads:
@@ -374,4 +371,3 @@ if __name__ == "__main__":
     finish = time.time()
     duration = finish - start
     print("\nRuntime: {:.4f}".format(duration))
-
