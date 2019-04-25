@@ -8,7 +8,9 @@
 </a>
 
 ## Instructions
-* Coming Soon!
+```
+$ python m_value.py
+```
 
 ## Results
 * Coming Soon!
