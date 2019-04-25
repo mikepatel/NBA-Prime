@@ -84,8 +84,9 @@ class Player:
         name = name.strip()
         return name
 
-    #
-    def get_column(self, matrix, c_idx):
+    # returns specified column of values
+    @staticmethod
+    def get_column(matrix, c_idx):
         return [row[c_idx] for row in matrix]
 
     #
@@ -228,7 +229,7 @@ class Player:
 
 
 ################################################################################
-# called by each thread, calculates players' primes and returns results in table format
+# calculates players' primes and returns results in table format and plots
 def run(url):
     break_line = "\n####################################################################################"
     p = Player(url)
@@ -301,7 +302,7 @@ def run(url):
 
     # print out table results at end
     output = [
-        break_line,
+        #break_line,
         out_name,
         out_raw_table,
         out_norm_table,
@@ -311,7 +312,7 @@ def run(url):
     #print(output)
 
     # PLOTS
-    plt.figure(figsize=(16, 8))
+    plt.figure(figsize=(20, 10))
     plt.suptitle(name)
 
     # Points
@@ -364,8 +365,7 @@ def run(url):
 
     #plt.show()
 
-    # write output to file
-    # create output directory
+    # Create output directory
     player_output_dir = os.path.join(OUTPUT_DIR, name)
     if not os.path.exists(player_output_dir):
         os.makedirs(player_output_dir)
@@ -386,7 +386,7 @@ def run(url):
 ################################################################################
 # Main
 if __name__ == "__main__":
-    start = time.time()
+    #start = time.time()
 
     delete_dir(OUTPUT_DIR)
 
@@ -400,21 +400,13 @@ if __name__ == "__main__":
         "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
     ]
 
-    """
-    # use threading for multiple urllib.requests
-    # create thread instance for each url in URLS
-    threads = [threading.Thread(target=run, args=(url,)) for url in URLS]  # comprehension
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
-    
-    """
     # multiprocessing
     processes = [multiprocessing.Process(target=run, args=(url,)) for url in URLS]
     for process in processes:
         process.start()
 
+    """
     finish = time.time()
     duration = finish - start
     print("\nRuntime: {:.4f}".format(duration))
+    """
