@@ -34,6 +34,7 @@ import numpy as np
 import time
 import re
 import multiprocessing
+import shutil
 from bs4 import BeautifulSoup
 import urllib  # standard library
 import urllib.request
@@ -43,6 +44,12 @@ import matplotlib.pyplot as plt
 
 ################################################################################
 OUTPUT_DIR = os.path.join(os.getcwd(), "Results")
+
+
+# deletes a given directory
+def delete_dir(d):
+    if os.path.exists(d):
+        shutil.rmtree(d)
 
 
 ################################################################################
@@ -380,6 +387,8 @@ def run(url):
 # Main
 if __name__ == "__main__":
     start = time.time()
+
+    delete_dir(OUTPUT_DIR)
 
     URLS = [
         "https://www.basketball-reference.com/players/j/jamesle01.html",  # LeBron James
