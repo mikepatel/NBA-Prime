@@ -22,25 +22,23 @@ Notes:
         - What is the relationship (balance) between player and team successes that define a player's prime?
     - make concurrent url requests => multiple threads
         - GUI, matplotlib, Tkinter vs in main loop
+        - threading vs multiprocessing
+        - USING MULTIPROCESSING INSTEAD OF THREADING
 
 """
 
 ################################################################################
 # IMPORTs
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
 import os
 import numpy as np
 import time
 import re
-import threading
-
+import multiprocessing
 from bs4 import BeautifulSoup
 import urllib  # standard library
 import urllib.request
 from prettytable import PrettyTable
+import matplotlib.pyplot as plt
 
 
 ################################################################################
@@ -78,6 +76,10 @@ class Player:
         name, _ = name.split("Stats")
         name = name.strip()
         return name
+
+    #
+    def get_column(self, matrix, c_idx):
+        return [row[c_idx] for row in matrix]
 
     #
     def get_prime(self, window_size):
@@ -299,17 +301,15 @@ def run(url):
         out_prime_table
     ]
     output = "".join(output)
-    print(output)
-
+    #print(output)
 
     # PLOTS
-    plt.figure()
-    plt.clf()
+    plt.figure(figsize=(16, 8))
     plt.suptitle(name)
 
     # Points
     plt.subplot(2, 3, 1)
-    plt.plot(p.SEASONS, p.PPG)
+    plt.plot(p.SEASONS, p.get_column(p.PPG, 0))
     plt.title("Points")
     plt.xticks(rotation=45)
     plt.subplots_adjust(hspace=0.5)
@@ -317,7 +317,7 @@ def run(url):
 
     # Rebounds
     plt.subplot(2, 3, 2)
-    plt.plot(p.SEASONS, p.RPG)
+    plt.plot(p.SEASONS, p.get_column(p.RPG, 0))
     plt.title("Rebounds")
     plt.xticks(rotation=45)
     plt.subplots_adjust(hspace=0.5)
@@ -325,7 +325,7 @@ def run(url):
 
     # Assists
     plt.subplot(2, 3, 3)
-    plt.plot(p.SEASONS, p.APG)
+    plt.plot(p.SEASONS, p.get_column(p.APG, 0))
     plt.title("Assists")
     plt.xticks(rotation=45)
     plt.subplots_adjust(hspace=0.5)
@@ -333,7 +333,7 @@ def run(url):
 
     # FT %
     plt.subplot(2, 3, 4)
-    plt.plot(p.SEASONS, p.FT_PERCENT)
+    plt.plot(p.SEASONS, p.get_column(p.FT_PERCENT, 0))
     plt.title("FT %")
     plt.xticks(rotation=45)
     plt.subplots_adjust(hspace=0.5)
@@ -341,7 +341,7 @@ def run(url):
 
     # PER
     plt.subplot(2, 3, 5)
-    plt.plot(p.SEASONS, p.PER)
+    plt.plot(p.SEASONS, p.get_column(p.PER, 0))
     plt.title("PER")
     plt.xticks(rotation=45)
     plt.subplots_adjust(hspace=0.5)
@@ -349,14 +349,13 @@ def run(url):
 
     # TS%
     plt.subplot(2, 3, 6)
-    plt.plot(p.SEASONS, p.TS)
+    plt.plot(p.SEASONS, p.get_column(p.TS, 0))
     plt.title("TS %")
     plt.xticks(rotation=45)
     plt.subplots_adjust(hspace=0.5)
     plt.grid()
 
     #plt.show()
-    plt.close()
 
     # write output to file
     # create output directory
@@ -365,11 +364,14 @@ def run(url):
         os.makedirs(player_output_dir)
 
     # save plot
-    plt.savefig(player_output_dir + "\\stat graphs.png")
+    plot_filename = name + "_plots.png"
+    plot_file = os.path.join(player_output_dir, plot_filename)
+    plt.savefig(plot_file)
+    plt.close()
 
     # write output to file
-    filename = name + "_results.txt"
-    out_file = os.path.join(player_output_dir, filename)
+    table_filename = name + "_results.txt"
+    out_file = os.path.join(player_output_dir, table_filename)
     with open(out_file, "a") as f:
         f.write(output)
 
@@ -389,6 +391,7 @@ if __name__ == "__main__":
         "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
     ]
 
+    """
     # use threading for multiple urllib.requests
     # create thread instance for each url in URLS
     threads = [threading.Thread(target=run, args=(url,)) for url in URLS]  # comprehension
@@ -396,6 +399,12 @@ if __name__ == "__main__":
         thread.start()
     for thread in threads:
         thread.join()
+    
+    """
+    # multiprocessing
+    processes = [multiprocessing.Process(target=run, args=(url,)) for url in URLS]
+    for process in processes:
+        process.start()
 
     finish = time.time()
     duration = finish - start
