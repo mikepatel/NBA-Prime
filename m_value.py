@@ -21,20 +21,30 @@ Notes:
         - How much does team chemistry factor into a player's prime?
         - What is the relationship (balance) between player and team successes that define a player's prime?
     - make concurrent url requests => multiple threads
+        - GUI, matplotlib, Tkinter vs in main loop
 
 """
 
 ################################################################################
 # IMPORTs
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+import os
+import numpy as np
+import time
+import re
+import threading
+
 from bs4 import BeautifulSoup
 import urllib  # standard library
 import urllib.request
-import numpy as np
 from prettytable import PrettyTable
-import re
-import matplotlib.pyplot as plt
-import threading
-import time
+
+
+################################################################################
+OUTPUT_DIR = os.path.join(os.getcwd(), "Results")
 
 
 ################################################################################
@@ -130,7 +140,7 @@ class Player:
                 ft_pct = self.read_stat_from_table(row, "ft_pct")
                 #print("FT%: ", ft_pct)
 
-                #
+                # update player's traditional stats
                 self.SEASONS.append(season)
                 self.AGE.append(age)
                 self.TEAM.append(team)
@@ -158,7 +168,7 @@ class Player:
                 ts = self.read_stat_from_table(row, "ts_pct")
                 #print("TS: ", ts)
 
-                #
+                # update player's advanced stats
                 self.PER.append([per])
                 self.TS.append([ts])
 
@@ -208,6 +218,7 @@ class Player:
             self.M_VALUE.append(m_value)
 
 
+################################################################################
 # called by each thread, calculates players' primes and returns results in table format
 def run(url):
     break_line = "\n####################################################################################"
@@ -220,14 +231,14 @@ def run(url):
     # Player stats
     p.get_stats()
 
-    # Traditional stats
-    trad_table = PrettyTable()
-    trad_table.field_names = [
+    # Raw stats
+    raw_table = PrettyTable()
+    raw_table.field_names = [
         "Year", "Age", "Team", "Points", "Rebounds",
         "Assists", "FT %", "PER", "TS", "M_VALUE"
     ]
     for i in range(len(p.SEASONS)):
-        trad_table.add_row([
+        raw_table.add_row([
             p.SEASONS[i],
             p.AGE[i],
             p.TEAM[i],
@@ -239,7 +250,7 @@ def run(url):
             p.TS[i][0],
             p.M_VALUE[i]])
 
-    out_trad_table = "\nTraditional\n" + str(trad_table) + "\n"
+    out_raw_table = "\nRaw\n" + str(raw_table) + "\n"
 
     # Normalized stats
     norm_table = PrettyTable()
@@ -283,15 +294,17 @@ def run(url):
     output = [
         break_line,
         out_name,
-        out_trad_table,
+        out_raw_table,
         out_norm_table,
         out_prime_table
     ]
     output = "".join(output)
     print(output)
 
-    """
+
     # PLOTS
+    plt.figure()
+    plt.clf()
     plt.suptitle(name)
 
     # Points
@@ -342,10 +355,26 @@ def run(url):
     plt.subplots_adjust(hspace=0.5)
     plt.grid()
 
-    plt.show()
-    """
+    #plt.show()
+    plt.close()
+
+    # write output to file
+    # create output directory
+    player_output_dir = os.path.join(OUTPUT_DIR, name)
+    if not os.path.exists(player_output_dir):
+        os.makedirs(player_output_dir)
+
+    # save plot
+    plt.savefig(player_output_dir + "\\stat graphs.png")
+
+    # write output to file
+    filename = name + "_results.txt"
+    out_file = os.path.join(player_output_dir, filename)
+    with open(out_file, "a") as f:
+        f.write(output)
 
 
+################################################################################
 # Main
 if __name__ == "__main__":
     start = time.time()
