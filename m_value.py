@@ -31,7 +31,6 @@ Notes:
 # IMPORTs
 import os
 import numpy as np
-import time
 import re
 import multiprocessing
 import shutil
@@ -111,7 +110,7 @@ class Player:
     def get_column(matrix, c_idx):
         return [row[c_idx] for row in matrix]
 
-    #
+    # Finds starting index for stats values list for a player's '?-year prime'
     def get_prime(self, window_size):
         avg_value = 0.0
         idx = 0
@@ -129,7 +128,7 @@ class Player:
 
         return idx  # return just the index
 
-    #
+    # reads a particular stat value from html data
     @staticmethod
     def read_stat_from_table(row, feature):
         x = float(row.find("td", {"data-stat": feature}).text.strip())
@@ -151,6 +150,7 @@ class Player:
         return stat
 
     # !! CONCERNED WITH JUST REGULAR SEASON !!
+    # builds stat value lists from html data
     def get_stats(self):
         # find "Per Game" table => Regular Season
         # 'Traditional' stats
@@ -222,7 +222,7 @@ class Player:
             except AttributeError:
                 continue  # for now
 
-    #
+    # Calculates 'm_value' per player season
     def calculate_m_value(self):
         # calculate m_value per each season
         self.PPG = self.normalize(self.PPG)
@@ -252,6 +252,136 @@ class Player:
             m_value = np.round(m_value, decimals=4)
             self.M_VALUE.append(m_value)
 
+    # Raw stats table
+    def build_raw_table(self):
+        raw_table = PrettyTable()
+        raw_table.field_names = [
+            "Year", "Age", "Team", "Points", "Rebounds",
+            "Assists", "FT %", "PER", "TS", "M_VALUE"
+        ]
+        for i in range(len(self.SEASONS)):
+            raw_table.add_row([
+                self.SEASONS[i],
+                self.AGE[i],
+                self.TEAM[i],
+                self.PPG[i][0],
+                self.RPG[i][0],
+                self.APG[i][0],
+                self.FT_PERCENT[i][0],
+                self.PER[i][0],
+                self.TS[i][0],
+                self.M_VALUE[i]])
+
+        out_raw_table = "\nRaw\n" + str(raw_table) + "\n"
+        return out_raw_table
+
+    # Normalized stats table
+    def build_norm_table(self):
+        norm_table = PrettyTable()
+        norm_table.field_names = [
+            "Year", "Age", "Team", "Points", "Rebounds",
+            "Assists", "FT %", "PER", "TS", "M_VALUE"
+        ]
+        for i in range(len(self.SEASONS)):
+            norm_table.add_row([
+                self.SEASONS[i],
+                self.AGE[i],
+                self.TEAM[i],
+                self.PPG[i][1],
+                self.RPG[i][1],
+                self.APG[i][1],
+                self.FT_PERCENT[i][1],
+                self.PER[i][1],
+                self.TS[i][1],
+                self.M_VALUE[i]])
+
+        out_norm_table = "\nNormalized\n" + str(norm_table) + "\n"
+        return out_norm_table
+
+    # M Value table
+    def build_m_value_table(self, window_size):
+        idx = self.get_prime(window_size=window_size)
+
+        name = self.get_name()
+        seasons = self.SEASONS[idx: idx + window_size]
+        ages = self.AGE[idx: idx + window_size]
+        teams = self.TEAM[idx: idx + window_size]
+        m_values = self.M_VALUE[idx: idx + window_size]
+
+        prime_table = PrettyTable()
+        prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
+        for i in range(len(seasons)):
+            prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
+
+        table_title = "\n" + name + " " + str(window_size) + "-year prime\n"
+        out_prime_table = table_title + str(prime_table) + "\n"
+        return out_prime_table
+
+    # Create output directory for each player
+    def get_player_dir(self):
+        name = self.get_name()
+        player_output_dir = os.path.join(OUTPUT_DIR, name)
+        if not os.path.exists(player_output_dir):
+            os.makedirs(player_output_dir)
+
+        return player_output_dir
+
+    # Plot raw stats and normalized stats
+    def plot_results(self):
+        name = self.get_name()
+        player_dir = self.get_player_dir()
+
+        stat_types = {
+            "Raw": 0,
+            "Normalized": 1
+        }
+
+        stat_cats = [
+            ["Points", self.PPG],
+            ["Rebounds", self.RPG],
+            ["Assists", self.APG],
+            ["FT %", self.FT_PERCENT],
+            ["PER", self.PER],
+            ["TS", self.TS]
+        ]
+
+        for st in stat_types:
+            stat_col = stat_types[st]
+            # create a plot figure with 6 subplots
+            plt.figure(figsize=(20, 10))
+            plt.suptitle(name + "_" + str(st))
+
+            for row in range(2):
+                for col in range(3):
+                    idx = 3*row + col
+                    subplot_idx = idx + 1
+
+                    stat = stat_cats[idx][1]
+
+                    plt.subplot(2, 3, subplot_idx)
+                    plt.plot(self.SEASONS, self.get_column(stat, stat_col))
+                    plt.title(stat_cats[idx][0])
+                    plt.xticks(rotation=45)
+                    plt.subplots_adjust(hspace=0.5)
+                    plt.grid()
+
+            # save plot
+            plot_filename = name + "_Plots_" + str(st) + ".png"
+            plot_file = os.path.join(player_dir, plot_filename)
+            plt.savefig(plot_file)
+            plt.close()
+
+    # Write table output to file
+    def save_tables(self, table):
+        name = self.get_name()
+        player_dir = self.get_player_dir()
+
+        table_filename = name + "_Table Results.txt"
+        out_file = os.path.join(player_dir, table_filename)
+
+        with open(out_file, "a") as f:
+            f.write(table)
+
 
 ################################################################################
 # calculates players' primes and returns results in table format and plots
@@ -263,150 +393,32 @@ def run(url):
     name = p.get_name()
     out_name = "\n" + name + "\n"
 
-    # Player stats
     p.get_stats()
     p.calculate_m_value()
-
-    # Raw stats
-    raw_table = PrettyTable()
-    raw_table.field_names = [
-        "Year", "Age", "Team", "Points", "Rebounds",
-        "Assists", "FT %", "PER", "TS", "M_VALUE"
-    ]
-    for i in range(len(p.SEASONS)):
-        raw_table.add_row([
-            p.SEASONS[i],
-            p.AGE[i],
-            p.TEAM[i],
-            p.PPG[i][0],
-            p.RPG[i][0],
-            p.APG[i][0],
-            p.FT_PERCENT[i][0],
-            p.PER[i][0],
-            p.TS[i][0],
-            p.M_VALUE[i]])
-
-    out_raw_table = "\nRaw\n" + str(raw_table) + "\n"
-
-    # Normalized stats
-    norm_table = PrettyTable()
-    norm_table.field_names = [
-        "Year", "Age", "Team", "Points", "Rebounds",
-        "Assists", "FT %", "PER", "TS", "M_VALUE"
-    ]
-    for i in range(len(p.SEASONS)):
-        norm_table.add_row([
-            p.SEASONS[i],
-            p.AGE[i],
-            p.TEAM[i],
-            p.PPG[i][1],
-            p.RPG[i][1],
-            p.APG[i][1],
-            p.FT_PERCENT[i][1],
-            p.PER[i][1],
-            p.TS[i][1],
-            p.M_VALUE[i]])
-
-    out_norm_table = "\nNormalized\n" + str(norm_table) + "\n"
+    raw_table = p.build_raw_table()  # Raw stats
+    norm_table = p.build_norm_table()  # Normalized stats
 
     # ?-year Prime stats
     WINDOW_SIZE = 3
-    idx = p.get_prime(window_size=WINDOW_SIZE)
+    prime_table = p.build_m_value_table(WINDOW_SIZE)  # m_values
 
-    seasons = p.SEASONS[idx: idx + WINDOW_SIZE]
-    ages = p.AGE[idx: idx + WINDOW_SIZE]
-    teams = p.TEAM[idx: idx + WINDOW_SIZE]
-    m_values = p.M_VALUE[idx: idx + WINDOW_SIZE]
-
-    prime_table = PrettyTable()
-    prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
-    for i in range(len(seasons)):
-        prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
-
-    table_title = "\n" + name + " " + str(WINDOW_SIZE) + "-year prime\n"
-    out_prime_table = table_title + str(prime_table) + "\n"
+    player_dir = p.get_player_dir()
 
     # print out table results at end
     output = [
         #break_line,
         out_name,
-        out_raw_table,
-        out_norm_table,
-        out_prime_table
+        raw_table,
+        norm_table,
+        prime_table
     ]
     output = "".join(output)
-    #print(output)
 
-    # PLOTS
-    plt.figure(figsize=(20, 10))
-    plt.suptitle(name)
+    # Write table output to file
+    p.save_tables(output)
 
-    # Points
-    plt.subplot(2, 3, 1)
-    plt.plot(p.SEASONS, p.get_column(p.PPG, 0))
-    plt.title("Points")
-    plt.xticks(rotation=45)
-    plt.subplots_adjust(hspace=0.5)
-    plt.grid()
-
-    # Rebounds
-    plt.subplot(2, 3, 2)
-    plt.plot(p.SEASONS, p.get_column(p.RPG, 0))
-    plt.title("Rebounds")
-    plt.xticks(rotation=45)
-    plt.subplots_adjust(hspace=0.5)
-    plt.grid()
-
-    # Assists
-    plt.subplot(2, 3, 3)
-    plt.plot(p.SEASONS, p.get_column(p.APG, 0))
-    plt.title("Assists")
-    plt.xticks(rotation=45)
-    plt.subplots_adjust(hspace=0.5)
-    plt.grid()
-
-    # FT %
-    plt.subplot(2, 3, 4)
-    plt.plot(p.SEASONS, p.get_column(p.FT_PERCENT, 0))
-    plt.title("FT %")
-    plt.xticks(rotation=45)
-    plt.subplots_adjust(hspace=0.5)
-    plt.grid()
-
-    # PER
-    plt.subplot(2, 3, 5)
-    plt.plot(p.SEASONS, p.get_column(p.PER, 0))
-    plt.title("PER")
-    plt.xticks(rotation=45)
-    plt.subplots_adjust(hspace=0.5)
-    plt.grid()
-
-    # TS%
-    plt.subplot(2, 3, 6)
-    plt.plot(p.SEASONS, p.get_column(p.TS, 0))
-    plt.title("TS %")
-    plt.xticks(rotation=45)
-    plt.subplots_adjust(hspace=0.5)
-    plt.grid()
-
-    #plt.show()
-
-    # Create output directory
-    player_output_dir = os.path.join(OUTPUT_DIR, name)
-    if not os.path.exists(player_output_dir):
-        os.makedirs(player_output_dir)
-
-    # save plot
-    plot_filename = name + "_plots.png"
-    plot_file = os.path.join(player_output_dir, plot_filename)
-    plt.savefig(plot_file)
-    plt.close()
-
-    # write output to file
-    table_filename = name + "_results.txt"
-    out_file = os.path.join(player_output_dir, table_filename)
-    with open(out_file, "a") as f:
-        f.write(output)
+    # Plot Raw and Normalized stats
+    p.plot_results()
 
 
 ################################################################################
