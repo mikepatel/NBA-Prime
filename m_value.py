@@ -35,6 +35,7 @@ import time
 import re
 import multiprocessing
 import shutil
+import csv
 from bs4 import BeautifulSoup
 import urllib  # standard library
 import urllib.request
@@ -44,12 +45,33 @@ import matplotlib.pyplot as plt
 
 ################################################################################
 OUTPUT_DIR = os.path.join(os.getcwd(), "Results")
+PLAYERS_CSV = os.path.join(os.getcwd(), "players list.csv")
 
 
 # deletes a given directory
 def delete_dir(d):
     if os.path.exists(d):
         shutil.rmtree(d)
+
+
+# creates list of Basketball Reference URLs
+def build_player_list():
+    url_list = []
+
+    with open(PLAYERS_CSV, newline="") as f:
+        csv_reader = csv.reader(f, delimiter=",")
+
+        line_count = 0
+
+        for row in csv_reader:
+            if line_count == 0:  # column names
+                line_count += 1
+            else:
+                url = str(row[1])  # Basketball Reference urls
+                url_list.append(url)
+                line_count += 1
+
+    return url_list
 
 
 ################################################################################
@@ -112,6 +134,21 @@ class Player:
     def read_stat_from_table(row, feature):
         x = float(row.find("td", {"data-stat": feature}).text.strip())
         return x
+
+    # normalize
+    @staticmethod
+    def normalize(stat):
+        stat_min = np.min(stat)
+        stat_max = np.max(stat)
+        den = stat_max - stat_min
+
+        for i in range(len(stat)):
+            num = stat[i][0] - stat_min
+            x = num / den
+            x = np.round(x, decimals=4)
+            stat[i].append(x)
+
+        return stat
 
     # !! CONCERNED WITH JUST REGULAR SEASON !!
     def get_stats(self):
@@ -185,27 +222,15 @@ class Player:
             except AttributeError:
                 continue  # for now
 
+    #
+    def calculate_m_value(self):
         # calculate m_value per each season
-        # normalize
-        def normalize(stat):
-            stat_min = np.min(stat)
-            stat_max = np.max(stat)
-            den = stat_max - stat_min
-
-            for i in range(len(stat)):
-                num = stat[i][0] - stat_min
-                x = num / den
-                x = np.round(x, decimals=4)
-                stat[i].append(x)
-
-            return stat
-
-        self.PPG = normalize(self.PPG)
-        self.RPG = normalize(self.RPG)
-        self.APG = normalize(self.APG)
-        self.FT_PERCENT = normalize(self.FT_PERCENT)
-        self.PER = normalize(self.PER)
-        self.TS = normalize(self.TS)
+        self.PPG = self.normalize(self.PPG)
+        self.RPG = self.normalize(self.RPG)
+        self.APG = self.normalize(self.APG)
+        self.FT_PERCENT = self.normalize(self.FT_PERCENT)
+        self.PER = self.normalize(self.PER)
+        self.TS = self.normalize(self.TS)
 
         # weight values
         w1 = 0.1  # points
@@ -240,6 +265,7 @@ def run(url):
 
     # Player stats
     p.get_stats()
+    p.calculate_m_value()
 
     # Raw stats
     raw_table = PrettyTable()
@@ -386,27 +412,11 @@ def run(url):
 ################################################################################
 # Main
 if __name__ == "__main__":
-    #start = time.time()
-
     delete_dir(OUTPUT_DIR)
 
-    URLS = [
-        "https://www.basketball-reference.com/players/j/jamesle01.html",  # LeBron James
-        "https://www.basketball-reference.com/players/b/bryanko01.html",  # Kobe Bryant
-        "https://www.basketball-reference.com/players/d/duranke01.html",  # Kevin Durant
-        "https://www.basketball-reference.com/players/h/hardeja01.html",  # James Harden
-        "https://www.basketball-reference.com/players/c/curryst01.html",  # Steph Curry
-        "https://www.basketball-reference.com/players/w/wadedw01.html",  # Dwayne Wade
-        "https://www.basketball-reference.com/players/n/nowitdi01.html"  # Dirk Nowitzki
-    ]
+    URLS = build_player_list()
 
     # multiprocessing
     processes = [multiprocessing.Process(target=run, args=(url,)) for url in URLS]
     for process in processes:
         process.start()
-
-    """
-    finish = time.time()
-    duration = finish - start
-    print("\nRuntime: {:.4f}".format(duration))
-    """
