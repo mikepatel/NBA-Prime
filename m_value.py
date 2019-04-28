@@ -17,6 +17,8 @@ Notes:
     - perform feature scaling (0/1 normalization) on stats before computing m_value
     - How best to store all stats data? How to pipe into model?
     - How much does 'consistency' matter for a player's prime? => variance over prime window
+        - Having trouble with Steph => need more features?
+            - eFG%: "efg_pct"
     - Can a player's prime include their first year on a team? (discounting injuries, suspensions, etc.)
         - How much does team chemistry factor into a player's prime?
         - What is the relationship (balance) between player and team successes that define a player's prime?
@@ -45,6 +47,7 @@ import matplotlib.pyplot as plt
 ################################################################################
 OUTPUT_DIR = os.path.join(os.getcwd(), "Results")
 PLAYERS_CSV = os.path.join(os.getcwd(), "players list.csv")
+#PLAYERS_CSV = os.path.join(os.getcwd(), "steph.csv")
 
 
 # deletes a given directory
@@ -111,20 +114,28 @@ class Player:
         return [row[c_idx] for row in matrix]
 
     # Finds starting index for stats values list for a player's '?-year prime'
+    # Use m_values for calculating prime windows
     def get_prime(self, window_size):
-        avg_value = 0.0
+        avg_m_value = 0.0
         idx = 0
 
         for i in range(len(self.M_VALUE)+1-window_size):
-            temp_variance = np.var(self.M_VALUE[i: i+window_size])
-            #print(i, temp_variance)
 
-            if temp_variance < 0.0015:
+            temp_variance = np.var(self.M_VALUE[i: i+window_size])
+            print(i, temp_variance)
+
+            if temp_variance < 0.0015:  # 0.0015
                 avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
 
                 if avg_candidate > avg_value:
                     avg_value = avg_candidate
                     idx = i
+            """
+            temp_m_value = np.mean(self.M_VALUE[i: i+window_size])
+            if temp_m_value > avg_m_value:
+                avg_m_value = temp_m_value
+                idx = i
+            """
 
         return idx  # return just the index
 
