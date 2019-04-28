@@ -224,7 +224,7 @@ class Player:
 
     # Calculates 'm_value' per player season
     def calculate_m_value(self):
-        # calculate m_value per each season
+        # normalize stats
         self.PPG = self.normalize(self.PPG)
         self.RPG = self.normalize(self.RPG)
         self.APG = self.normalize(self.APG)
@@ -401,8 +401,6 @@ def run(url):
     # ?-year Prime stats
     WINDOW_SIZE = 3
     prime_table = p.build_m_value_table(WINDOW_SIZE)  # m_values
-
-    player_dir = p.get_player_dir()
 
     # print out table results at end
     output = [
