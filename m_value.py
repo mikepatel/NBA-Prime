@@ -87,6 +87,9 @@ class Player:
 
         self.soup = BeautifulSoup(re.sub("<!--|-->", "", str(page)), "html.parser")
 
+        # player name
+        self.name = self.get_name()
+
         self.SEASONS = []  # year xxxx-xx
         self.AGE = []  # age at start of season
         self.TEAM = []  # NBA team
@@ -145,29 +148,33 @@ class Player:
     # reads a particular stat value from html data
     @staticmethod
     def read_stat_from_table(row, feature):
-        x = float(row.find("td", {"data-stat": feature}).text.strip())
-        return x
+        try:
+            x = float(row.find("td", {"data-stat": feature}).text.strip())
+            return x
+        except AttributeError as e:
+            if "attribute 'text'" in str(e):
+                return float(0.0)
 
     # normalize
     @staticmethod
     def normalize(stat):
-        try:
-            stat_min = np.min(stat)
-            stat_max = np.max(stat)
-            den = stat_max - stat_min
-        except ValueError as e:
-            #print(str(e))
-            #print(str(stat))
-            #print(self.get_name())
-            pass
+        stat_min = np.min(stat)
+        stat_max = np.max(stat)
+        den = stat_max - stat_min
 
-        for i in range(len(stat)):
-            num = stat[i][0] - stat_min
-            x = num / den
-            x = np.round(x, decimals=4)
-            stat[i].append(x)
+        if den == 0.0:
+            for i in range(len(stat)):
+                stat[i].append(0.0)
+            return stat
 
-        return stat
+        else:
+            for i in range(len(stat)):
+                num = stat[i][0] - stat_min
+                x = num / den
+                x = np.round(x, decimals=4)
+                stat[i].append(x)
+
+            return stat
 
     # !! CONCERNED WITH JUST REGULAR SEASON !!
     # builds stat value lists from html data
@@ -209,7 +216,6 @@ class Player:
 
                 # eFG%
                 efg_pct = self.read_stat_from_table(row, "efg_pct")
-
                 #print("eFG%: ", efg_pct)
 
                 # update player's traditional stats
@@ -222,8 +228,9 @@ class Player:
                 self.FT_PERCENT.append([ft_pct])
                 self.EFG_PERCENT.append([efg_pct])
 
-            except AttributeError:
-                continue  # for now
+            except AttributeError as e:
+                if "attribute 'a'" in str(e):  # 'Season' is not a hyperlink
+                    continue
 
         # find "Advanced" table
         # 'Advanced' stats
@@ -333,7 +340,7 @@ class Player:
     def build_m_value_table(self, window_size):
         idx = self.get_prime(window_size=window_size)
 
-        name = self.get_name()
+        name = self.name
         seasons = self.SEASONS[idx: idx + window_size]
         ages = self.AGE[idx: idx + window_size]
         teams = self.TEAM[idx: idx + window_size]
@@ -350,7 +357,7 @@ class Player:
 
     # Create output directory for each player
     def get_player_dir(self):
-        name = self.get_name()
+        name = self.name
         player_output_dir = os.path.join(OUTPUT_DIR, name)
         if not os.path.exists(player_output_dir):
             os.makedirs(player_output_dir)
@@ -359,7 +366,7 @@ class Player:
 
     # Plot raw stats and normalized stats
     def plot_results(self):
-        name = self.get_name()
+        name = self.name
         player_dir = self.get_player_dir()
 
         stat_types = {
@@ -403,7 +410,7 @@ class Player:
 
     # Write table output to file
     def save_tables(self, table):
-        name = self.get_name()
+        name = self.name
         player_dir = self.get_player_dir()
 
         table_filename = name + "_Table Results.txt"
