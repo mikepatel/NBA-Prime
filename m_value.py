@@ -19,6 +19,8 @@ Notes:
     - How much does 'consistency' matter for a player's prime? => variance over prime window
         - Having trouble with Steph => need more features?
             - eFG%: "efg_pct"
+            - https://www.basketball-reference.com/about/factors.html  Dean Oliver 4 factors
+            - RNN, LSTM
     - Can a player's prime include their first year on a team? (discounting injuries, suspensions, etc.)
         - How much does team chemistry factor into a player's prime?
         - What is the relationship (balance) between player and team successes that define a player's prime?
@@ -96,6 +98,7 @@ class Player:
         self.PER = []  # player efficiency rating per
         self.TS = []  # true shooting percentage per
         self.FT_PERCENT = []  # free throw percentage per
+        self.EFG_PERCENT = []  # effective field goal percentage per
 
         # custom statistic
         # calculated for each season
@@ -122,13 +125,13 @@ class Player:
         for i in range(len(self.M_VALUE)+1-window_size):
 
             temp_variance = np.var(self.M_VALUE[i: i+window_size])
-            print(i, temp_variance)
+            #print(i, temp_variance)
 
             if temp_variance < 0.0015:  # 0.0015
                 avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
 
-                if avg_candidate > avg_value:
-                    avg_value = avg_candidate
+                if avg_candidate > avg_m_value:
+                    avg_m_value = avg_candidate
                     idx = i
             """
             temp_m_value = np.mean(self.M_VALUE[i: i+window_size])
@@ -148,9 +151,15 @@ class Player:
     # normalize
     @staticmethod
     def normalize(stat):
-        stat_min = np.min(stat)
-        stat_max = np.max(stat)
-        den = stat_max - stat_min
+        try:
+            stat_min = np.min(stat)
+            stat_max = np.max(stat)
+            den = stat_max - stat_min
+        except ValueError as e:
+            #print(str(e))
+            #print(str(stat))
+            #print(self.get_name())
+            pass
 
         for i in range(len(stat)):
             num = stat[i][0] - stat_min
@@ -198,6 +207,11 @@ class Player:
                 ft_pct = self.read_stat_from_table(row, "ft_pct")
                 #print("FT%: ", ft_pct)
 
+                # eFG%
+                efg_pct = self.read_stat_from_table(row, "efg_pct")
+
+                #print("eFG%: ", efg_pct)
+
                 # update player's traditional stats
                 self.SEASONS.append(season)
                 self.AGE.append(age)
@@ -206,6 +220,7 @@ class Player:
                 self.RPG.append([rpg])
                 self.APG.append([apg])
                 self.FT_PERCENT.append([ft_pct])
+                self.EFG_PERCENT.append([efg_pct])
 
             except AttributeError:
                 continue  # for now
@@ -240,6 +255,7 @@ class Player:
         self.RPG = self.normalize(self.RPG)
         self.APG = self.normalize(self.APG)
         self.FT_PERCENT = self.normalize(self.FT_PERCENT)
+        self.EFG_PERCENT = self.normalize(self.EFG_PERCENT)
         self.PER = self.normalize(self.PER)
         self.TS = self.normalize(self.TS)
 
@@ -250,6 +266,7 @@ class Player:
         w4 = 0.1  # FT percentage
         w5 = 0.1  # PER
         w6 = 0.1  # TS
+        w7 = 0.1  # eFG percentage
 
         for i in range(len(self.SEASONS)):
             m_value = np.sum([
@@ -258,7 +275,8 @@ class Player:
                 w3*self.APG[i][1],
                 w4*self.FT_PERCENT[i][1],
                 w5*self.PER[i][1],
-                w6*self.TS[i][1]
+                w6*self.TS[i][1],
+                w7*self.EFG_PERCENT[i][1]
             ])
             m_value = np.round(m_value, decimals=4)
             self.M_VALUE.append(m_value)
@@ -268,7 +286,7 @@ class Player:
         raw_table = PrettyTable()
         raw_table.field_names = [
             "Year", "Age", "Team", "Points", "Rebounds",
-            "Assists", "FT %", "PER", "TS", "M_VALUE"
+            "Assists", "FT %", "PER", "TS", "eFG %", "M_VALUE"
         ]
         for i in range(len(self.SEASONS)):
             raw_table.add_row([
@@ -281,6 +299,7 @@ class Player:
                 self.FT_PERCENT[i][0],
                 self.PER[i][0],
                 self.TS[i][0],
+                self.EFG_PERCENT[i][0],
                 self.M_VALUE[i]])
 
         out_raw_table = "\nRaw\n" + str(raw_table) + "\n"
@@ -291,7 +310,7 @@ class Player:
         norm_table = PrettyTable()
         norm_table.field_names = [
             "Year", "Age", "Team", "Points", "Rebounds",
-            "Assists", "FT %", "PER", "TS", "M_VALUE"
+            "Assists", "FT %", "PER", "TS", "eFG %", "M_VALUE"
         ]
         for i in range(len(self.SEASONS)):
             norm_table.add_row([
@@ -304,6 +323,7 @@ class Player:
                 self.FT_PERCENT[i][1],
                 self.PER[i][1],
                 self.TS[i][1],
+                self.EFG_PERCENT[i][1],
                 self.M_VALUE[i]])
 
         out_norm_table = "\nNormalized\n" + str(norm_table) + "\n"
@@ -353,28 +373,27 @@ class Player:
             ["Assists", self.APG],
             ["FT %", self.FT_PERCENT],
             ["PER", self.PER],
-            ["TS", self.TS]
+            ["TS", self.TS],
+            ["eFG %", self.EFG_PERCENT]
         ]
 
         for st in stat_types:
             stat_col = stat_types[st]
-            # create a plot figure with 6 subplots
+            # create a plot figure with subplots
             plt.figure(figsize=(20, 10))
             plt.suptitle(name + "_" + str(st))
 
-            for row in range(2):
-                for col in range(3):
-                    idx = 3*row + col
-                    subplot_idx = idx + 1
+            for idx in range(7):
+                subplot_idx = idx + 1
 
-                    stat = stat_cats[idx][1]
+                stat = stat_cats[idx][1]
 
-                    plt.subplot(2, 3, subplot_idx)
-                    plt.plot(self.SEASONS, self.get_column(stat, stat_col))
-                    plt.title(stat_cats[idx][0])
-                    plt.xticks(rotation=45)
-                    plt.subplots_adjust(hspace=0.5)
-                    plt.grid()
+                plt.subplot(3, 3, subplot_idx)
+                plt.plot(self.SEASONS, self.get_column(stat, stat_col))
+                plt.title(stat_cats[idx][0])
+                plt.xticks(rotation=45)
+                plt.subplots_adjust(hspace=0.5)
+                plt.grid()
 
             # save plot
             plot_filename = name + "_Plots_" + str(st) + ".png"
