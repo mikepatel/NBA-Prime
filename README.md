@@ -1,4 +1,4 @@
-# NBA-Prime Data Model
+# NBA-Prime
 ## Overview
 * Building a data-driven model to find an NBA player's "prime" that can be used to construct an ultimate power ranking of the greatest NBA players
 * Using a variety of statistical metrics provided by Basketball Reference and NBA Stats
