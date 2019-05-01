@@ -290,16 +290,6 @@ class Player:
         for key in self.STAT_CATS:
             self.STAT_CATS[key] = self.normalize(self.STAT_CATS[key])
 
-        """
-        self.PPG = self.normalize(self.PPG)
-        self.RPG = self.normalize(self.RPG)
-        self.APG = self.normalize(self.APG)
-        self.FT_PERCENT = self.normalize(self.FT_PERCENT)
-        self.EFG_PERCENT = self.normalize(self.EFG_PERCENT)
-        self.PER = self.normalize(self.PER)
-        self.TS = self.normalize(self.TS)
-        """
-
         # weight values
         w1 = 0.1  # points
         w2 = 0.1  # rebounds
@@ -425,21 +415,23 @@ class Player:
 
         for st in stat_types:
             stat_col = stat_types[st]
+
             # create a plot figure with subplots
             plt.figure(figsize=(20, 10))
             plt.suptitle(name + "_" + str(st))
 
-            for idx in range(7):
-                subplot_idx = idx + 1
-
-                stat = stat_cats[idx][1]
+            subplot_idx = 1
+            for key in self.STAT_CATS:
+                stat = self.STAT_CATS[key]
 
                 plt.subplot(3, 3, subplot_idx)
                 plt.plot(self.SEASONS, self.get_column(stat, stat_col))
-                plt.title(stat_cats[idx][0])
+                plt.title(key)
                 plt.xticks(rotation=45)
                 plt.subplots_adjust(hspace=0.5)
                 plt.grid()
+
+                subplot_idx += 1
 
             # save plot
             plot_filename = name + "_Plots_" + str(st) + ".png"
