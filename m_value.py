@@ -126,9 +126,8 @@ class Player:
         idx = 0
 
         for i in range(len(self.M_VALUE)+1-window_size):
-
             temp_variance = np.var(self.M_VALUE[i: i+window_size])
-            #print(i, temp_variance)
+            # print(i, temp_variance)
 
             if temp_variance < 0.0015:  # 0.0015
                 avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
@@ -136,12 +135,6 @@ class Player:
                 if avg_candidate > avg_m_value:
                     avg_m_value = avg_candidate
                     idx = i
-            """
-            temp_m_value = np.mean(self.M_VALUE[i: i+window_size])
-            if temp_m_value > avg_m_value:
-                avg_m_value = temp_m_value
-                idx = i
-            """
 
         return idx  # return just the index
 
@@ -162,12 +155,14 @@ class Player:
         stat_max = np.max(stat)
         den = stat_max - stat_min
 
-        if den == 0.0:
+        if den == 0.0:  # Should not divide by zero
             for i in range(len(stat)):
                 stat[i].append(0.0)
             return stat
 
         else:
+            # normalize a stat value and append,
+            # producing [raw_stat, normalized_stat]
             for i in range(len(stat)):
                 num = stat[i][0] - stat_min
                 x = num / den
@@ -176,14 +171,27 @@ class Player:
 
             return stat
 
-    # !! CONCERNED WITH JUST REGULAR SEASON !!
-    # builds stat value lists from html data
-    def get_stats(self):
+    # "Per Game" table => Regular Season
+    # 'Traditional' Stats
+    def get_trad_table(self):
         # find "Per Game" table => Regular Season
         # 'Traditional' stats
         table = self.soup.find("table", {"id": "per_game"})
         table_body = table.find("tbody")
         rows = table_body.find_all("tr")
+        return rows
+
+    # find "Advanced" table
+    # 'Advanced' stats
+    def get_advanced_table(self):
+        table = self.soup.find("table", {"id": "advanced"})
+        table_body = table.find("tbody")
+        rows = table_body.find_all("tr")
+        return rows
+
+    # Points, Rebounds, Assists, FT%, eFG%
+    def get_reg_season_trad_stats(self):
+        rows = self.get_trad_table()
 
         for row in rows:
             try:
@@ -200,28 +208,30 @@ class Player:
 
                 # points
                 ppg = self.read_stat_from_table(row, "pts_per_g")
-                #print("Points: ", ppg)
+                # print("Points: ", ppg)
 
                 # rebounds
                 rpg = self.read_stat_from_table(row, "trb_per_g")
-                #print("Rebounds: ", rpg)
+                # print("Rebounds: ", rpg)
 
                 # assists
                 apg = self.read_stat_from_table(row, "ast_per_g")
-                #print("Assists: ", apg)
+                # print("Assists: ", apg)
 
                 # FT%
                 ft_pct = self.read_stat_from_table(row, "ft_pct")
-                #print("FT%: ", ft_pct)
+                # print("FT%: ", ft_pct)
 
                 # eFG%
                 efg_pct = self.read_stat_from_table(row, "efg_pct")
-                #print("eFG%: ", efg_pct)
+                # print("eFG%: ", efg_pct)
 
-                # update player's traditional stats
+                # update player's bio information
                 self.SEASONS.append(season)
                 self.AGE.append(age)
                 self.TEAM.append(team)
+
+                # update player's traditional stats
                 self.PPG.append([ppg])
                 self.RPG.append([rpg])
                 self.APG.append([apg])
@@ -232,21 +242,18 @@ class Player:
                 if "attribute 'a'" in str(e):  # 'Season' is not a hyperlink
                     continue
 
-        # find "Advanced" table
-        # 'Advanced' stats
-        table = self.soup.find("table", {"id": "advanced"})
-        table_body = table.find("tbody")
-        rows = table_body.find_all("tr")
-
+    # PER, TS%
+    def get_reg_season_advanced_stats(self):
+        rows = self.get_advanced_table()
         for row in rows:
             try:
                 # PER
                 per = self.read_stat_from_table(row, "per")
-                #print("PER: ", per)
+                # print("PER: ", per)
 
                 # TS
                 ts = self.read_stat_from_table(row, "ts_pct")
-                #print("TS: ", ts)
+                # print("TS: ", ts)
 
                 # update player's advanced stats
                 self.PER.append([per])
@@ -254,6 +261,16 @@ class Player:
 
             except AttributeError:
                 continue  # for now
+
+    def get_reg_season_stats(self):
+        self.get_reg_season_trad_stats()  # Regular Season: seasons, age, team
+                                            # points, rebounds, assists, FT%, eFG%
+        self.get_reg_season_advanced_stats()  # Regular Season: PER, TS%
+
+    # !! CONCERNED WITH JUST REGULAR SEASON !!
+    # builds stat value lists from html data
+    def get_stats(self):
+        self.get_reg_season_stats()
 
     # Calculates 'm_value' per player season
     def calculate_m_value(self):
@@ -423,7 +440,7 @@ class Player:
 ################################################################################
 # calculates players' primes and returns results in table format and plots
 def run(url):
-    break_line = "\n####################################################################################"
+    # break_line = "\n####################################################################################"
     p = Player(url)
 
     # Player name
@@ -441,7 +458,7 @@ def run(url):
 
     # print out table results at end
     output = [
-        #break_line,
+        # break_line,
         out_name,
         raw_table,
         norm_table,
