@@ -49,7 +49,6 @@ import matplotlib.pyplot as plt
 ################################################################################
 OUTPUT_DIR = os.path.join(os.getcwd(), "Results")
 PLAYERS_CSV = os.path.join(os.getcwd(), "players list.csv")
-#PLAYERS_CSV = os.path.join(os.getcwd(), "steph.csv")
 
 
 # deletes a given directory
@@ -98,10 +97,10 @@ class Player:
         self.PPG = []  # points per
         self.RPG = []  # rebounds per
         self.APG = []  # assists per
-        self.PER = []  # player efficiency rating per
-        self.TS = []  # true shooting percentage per
         self.FT_PERCENT = []  # free throw percentage per
         self.EFG_PERCENT = []  # effective field goal percentage per
+        self.PER = []  # player efficiency rating per
+        self.TS = []  # true shooting percentage per
 
         # custom statistic
         # calculated for each season
@@ -112,10 +111,10 @@ class Player:
             "Points": self.PPG,  # points
             "Rebounds": self.RPG,  # rebounds
             "Assists": self.APG,  # assists
-            "FT Percentage": self.FT_PERCENT,  # FT%
-            "eFG Percentage": self.EFG_PERCENT,  # eFG%
+            "FT %": self.FT_PERCENT,  # FT%
+            "eFG %": self.EFG_PERCENT,  # eFG%
             "PER": self.PER,  # PER
-            "TS": self.TS  # TS%
+            "TS %": self.TS  # TS%
         }
 
     # returns player's name
@@ -247,8 +246,8 @@ class Player:
                 self.STAT_CATS["Points"].append([ppg])
                 self.STAT_CATS["Rebounds"].append([rpg])
                 self.STAT_CATS["Assists"].append([apg])
-                self.STAT_CATS["FT Percentage"].append([ft_pct])
-                self.STAT_CATS["eFG Percentage"].append([efg_pct])
+                self.STAT_CATS["FT %"].append([ft_pct])
+                self.STAT_CATS["eFG %"].append([efg_pct])
 
             except AttributeError as e:
                 if "attribute 'a'" in str(e):  # 'Season' is not a hyperlink
@@ -269,14 +268,14 @@ class Player:
 
                 # update player's advanced stats
                 self.STAT_CATS["PER"].append([per])
-                self.STAT_CATS["TS"].append([ts])
+                self.STAT_CATS["TS %"].append([ts])
 
             except AttributeError:
                 continue  # for now
 
     def get_reg_season_stats(self):
-        self.get_reg_season_trad_stats()  # Regular Season: seasons, age, team
-                                            # points, rebounds, assists, FT%, eFG%
+        self.get_reg_season_trad_stats()  # Regular Season: seasons, age, team,
+        # points, rebounds, assists, FT%, eFG%
         self.get_reg_season_advanced_stats()  # Regular Season: PER, TS%
 
     # !! CONCERNED WITH JUST REGULAR SEASON !!
@@ -295,9 +294,9 @@ class Player:
         w2 = 0.1  # rebounds
         w3 = 0.1  # assists
         w4 = 0.1  # FT percentage
-        w5 = 0.1  # PER
-        w6 = 0.1  # TS
-        w7 = 0.1  # eFG percentage
+        w5 = 0.1  # eFG percentage
+        w6 = 0.1  # PER
+        w7 = 0.1  # TS
 
         for i in range(len(self.SEASONS)):
             m_value = np.sum([
@@ -305,9 +304,9 @@ class Player:
                 w2*self.RPG[i][1],
                 w3*self.APG[i][1],
                 w4*self.FT_PERCENT[i][1],
+                w7 * self.EFG_PERCENT[i][1],
                 w5*self.PER[i][1],
-                w6*self.TS[i][1],
-                w7*self.EFG_PERCENT[i][1]
+                w6*self.TS[i][1]
             ])
             m_value = np.round(m_value, decimals=4)
             self.M_VALUE.append(m_value)
@@ -317,7 +316,7 @@ class Player:
     def get_table_field_names():
         return [
             "Year", "Age", "Team", "Points", "Rebounds",
-            "Assists", "FT %", "PER", "TS", "eFG %", "M_VALUE"
+            "Assists", "FT %", "eFG %", "PER", "TS %", "M_VALUE"
         ]
 
     # Raw stats table
@@ -334,9 +333,9 @@ class Player:
                 self.RPG[i][0],
                 self.APG[i][0],
                 self.FT_PERCENT[i][0],
+                self.EFG_PERCENT[i][0],
                 self.PER[i][0],
                 self.TS[i][0],
-                self.EFG_PERCENT[i][0],
                 self.M_VALUE[i]])
 
         out_raw_table = "\nRaw\n" + str(raw_table) + "\n"
@@ -356,9 +355,9 @@ class Player:
                 self.RPG[i][1],
                 self.APG[i][1],
                 self.FT_PERCENT[i][1],
+                self.EFG_PERCENT[i][1],
                 self.PER[i][1],
                 self.TS[i][1],
-                self.EFG_PERCENT[i][1],
                 self.M_VALUE[i]])
 
         out_norm_table = "\nNormalized\n" + str(norm_table) + "\n"
@@ -402,16 +401,6 @@ class Player:
             "Raw": 0,
             "Normalized": 1
         }
-
-        stat_cats = [
-            ["Points", self.PPG],
-            ["Rebounds", self.RPG],
-            ["Assists", self.APG],
-            ["FT %", self.FT_PERCENT],
-            ["PER", self.PER],
-            ["TS", self.TS],
-            ["eFG %", self.EFG_PERCENT]
-        ]
 
         for st in stat_types:
             stat_col = stat_types[st]
@@ -467,8 +456,8 @@ def run(url):
     norm_table = p.build_norm_table()  # Normalized stats
 
     # ?-year Prime stats
-    WINDOW_SIZE = 3
-    prime_table = p.build_m_value_table(WINDOW_SIZE)  # m_values
+    window_size = 3
+    prime_table = p.build_m_value_table(window_size)  # m_values
 
     # print out table results at end
     output = [
