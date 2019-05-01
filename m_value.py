@@ -107,6 +107,17 @@ class Player:
         # calculated for each season
         self.M_VALUE = []
 
+        # build dict for stat categories
+        self.STAT_CATS = {
+            "Points": self.PPG,  # points
+            "Rebounds": self.RPG,  # rebounds
+            "Assists": self.APG,  # assists
+            "FT Percentage": self.FT_PERCENT,  # FT%
+            "eFG Percentage": self.EFG_PERCENT,  # eFG%
+            "PER": self.PER,  # PER
+            "TS": self.TS  # TS%
+        }
+
     # returns player's name
     def get_name(self):
         name = self.soup.title.text.strip()
@@ -233,11 +244,11 @@ class Player:
                 self.TEAM.append(team)
 
                 # update player's traditional stats
-                self.PPG.append([ppg])
-                self.RPG.append([rpg])
-                self.APG.append([apg])
-                self.FT_PERCENT.append([ft_pct])
-                self.EFG_PERCENT.append([efg_pct])
+                self.STAT_CATS["Points"].append([ppg])
+                self.STAT_CATS["Rebounds"].append([rpg])
+                self.STAT_CATS["Assists"].append([apg])
+                self.STAT_CATS["FT Percentage"].append([ft_pct])
+                self.STAT_CATS["eFG Percentage"].append([efg_pct])
 
             except AttributeError as e:
                 if "attribute 'a'" in str(e):  # 'Season' is not a hyperlink
@@ -257,8 +268,8 @@ class Player:
                 # print("TS: ", ts)
 
                 # update player's advanced stats
-                self.PER.append([per])
-                self.TS.append([ts])
+                self.STAT_CATS["PER"].append([per])
+                self.STAT_CATS["TS"].append([ts])
 
             except AttributeError:
                 continue  # for now
@@ -276,6 +287,10 @@ class Player:
     # Calculates 'm_value' per player season
     def calculate_m_value(self):
         # normalize stats
+        for key in self.STAT_CATS:
+            self.STAT_CATS[key] = self.normalize(self.STAT_CATS[key])
+
+        """
         self.PPG = self.normalize(self.PPG)
         self.RPG = self.normalize(self.RPG)
         self.APG = self.normalize(self.APG)
@@ -283,6 +298,7 @@ class Player:
         self.EFG_PERCENT = self.normalize(self.EFG_PERCENT)
         self.PER = self.normalize(self.PER)
         self.TS = self.normalize(self.TS)
+        """
 
         # weight values
         w1 = 0.1  # points
@@ -370,7 +386,7 @@ class Player:
 
         prime_table = PrettyTable()
         prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
-        
+
         for i in range(len(seasons)):
             prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
 
