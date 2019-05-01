@@ -189,6 +189,7 @@ class Player:
         rows = table_body.find_all("tr")
         return rows
 
+    # Seasons, Ages, Teams
     # Points, Rebounds, Assists, FT%, eFG%
     def get_reg_season_trad_stats(self):
         rows = self.get_trad_table()
@@ -305,13 +306,19 @@ class Player:
             m_value = np.round(m_value, decimals=4)
             self.M_VALUE.append(m_value)
 
-    # Raw stats table
-    def build_raw_table(self):
-        raw_table = PrettyTable()
-        raw_table.field_names = [
+    # Field names for PrettyTable output
+    @staticmethod
+    def get_table_field_names():
+        return [
             "Year", "Age", "Team", "Points", "Rebounds",
             "Assists", "FT %", "PER", "TS", "eFG %", "M_VALUE"
         ]
+
+    # Raw stats table
+    def build_raw_table(self):
+        raw_table = PrettyTable()
+        raw_table.field_names = self.get_table_field_names()
+
         for i in range(len(self.SEASONS)):
             raw_table.add_row([
                 self.SEASONS[i],
@@ -332,10 +339,8 @@ class Player:
     # Normalized stats table
     def build_norm_table(self):
         norm_table = PrettyTable()
-        norm_table.field_names = [
-            "Year", "Age", "Team", "Points", "Rebounds",
-            "Assists", "FT %", "PER", "TS", "eFG %", "M_VALUE"
-        ]
+        norm_table.field_names = self.get_table_field_names()
+
         for i in range(len(self.SEASONS)):
             norm_table.add_row([
                 self.SEASONS[i],
@@ -365,6 +370,7 @@ class Player:
 
         prime_table = PrettyTable()
         prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
+        
         for i in range(len(seasons)):
             prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
 
