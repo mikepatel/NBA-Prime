@@ -49,8 +49,8 @@ def delete_dir(d):
         shutil.rmtree(d)
 
 
-# creates list of Basketball Reference URLs
-def build_player_list():
+# create and return list of Basketball Reference URLs
+def get_player_urls():
     url_list = []
 
     column_header = "Basketball Reference URL"
@@ -65,12 +65,11 @@ def build_player_list():
 ################################################################################
 # calculates players' primes and returns results in table format and plots
 def run(url):
-    # break_line = "\n####################################################################################"
     p = Player(url)
 
     # Player name
     name = p.get_name()
-    out_name = "\n" + name + "\n"
+    #out_name = "\n" + name + "\n"
 
     p.get_stats()
     quit()
@@ -105,9 +104,11 @@ def run(url):
 ################################################################################
 # Main
 if __name__ == "__main__":
+    # initial cleanup
     delete_dir(OUTPUT_DIR)
 
-    URLS = build_player_list()
+    # get list of Basketball Reference URLs
+    URLS = get_player_urls()
 
     # multiprocessing
     processes = [multiprocessing.Process(target=run, args=(url,)) for url in URLS]

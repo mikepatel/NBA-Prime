@@ -72,22 +72,32 @@ class Player:
             "M_VALUE": self.M_VALUE  # m value
         }
 
-        # stats dataframe
+        # initialize stats dataframes
         self.raw_stats_df = pd.DataFrame()
+        self.norm_stats_df = pd.DataFrame()
+        self.m_value_df = pd.DataFrame()
 
-    # returns player's name
+    # return player's name
     def get_name(self):
         name = self.soup.title.text.strip()
         name, _ = name.split("Stats")
         name = name.strip()
         return name
 
-    # update raw_stats_df (raw table)
+    # update raw stats df
     def update_raw_stats_df(self):
         self.raw_stats_df = pd.DataFrame({k: pd.Series(v) for k, v in self.CATEGORIES.items()})
         print(self.raw_stats_df)
 
-    # !! CONCERNED WITH JUST REGULAR SEASON !!
+    # update normalized stats df
+    def update_norm_stats_df(self):
+        print()
+
+    # update m_value stats df
+    def update_m_value_stats_df(self):
+        print()
+
+    # !! CONCERNED WITH JUST REGULAR SEASON FOR RIGHT NOW !!
     # parse html data for stats
     def get_stats(self):
         self.get_reg_season_stats()  # regular season
@@ -106,7 +116,7 @@ class Player:
         print("To do")
         return self
 
-    #
+    # regular season traditional stats
     def get_reg_season_trad_stats(self):
         # Seasons, Ages, Teams, Points, Rebounds, Assists, FT %, eFG %
         rows = self.get_trad_table()
@@ -160,7 +170,7 @@ class Player:
                 if "attribute 'a'" in str(e):  # 'Season' is not a hyperlink
                     continue
 
-    #
+    # regular season advanced stats
     def get_reg_season_advanced_stats(self):
         # PER, TS%
         rows = self.get_advanced_table()
