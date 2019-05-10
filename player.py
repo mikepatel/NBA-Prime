@@ -73,7 +73,7 @@ class Player:
         }
 
         # stats dataframe
-        self.stats_df = pd.DataFrame()
+        self.raw_stats_df = pd.DataFrame()
 
     # returns player's name
     def get_name(self):
@@ -82,13 +82,16 @@ class Player:
         name = name.strip()
         return name
 
+    # update raw_stats_df (raw table)
+    def update_raw_stats_df(self):
+        self.raw_stats_df = pd.DataFrame({k: pd.Series(v) for k, v in self.CATEGORIES.items()})
+        print(self.raw_stats_df)
+
     # !! CONCERNED WITH JUST REGULAR SEASON !!
     # parse html data for stats
     def get_stats(self):
         self.get_reg_season_stats()  # regular season
-
-        self.stats_df = pd.DataFrame({k: pd.Series(v) for k, v in self.CATEGORIES.items()})
-        print(self.stats_df)
+        self.update_raw_stats_df()
 
         # self.get_playoff_stats()  # playoffs
 
