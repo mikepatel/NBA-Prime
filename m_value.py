@@ -38,14 +38,11 @@ import multiprocessing
 import shutil
 import pandas as pd
 
-from player import *  # custom class
+from player import Player  # custom class
+from constants import *
 
 
 ################################################################################
-OUTPUT_DIR = os.path.join(os.getcwd(), "Results")
-PLAYERS_CSV = os.path.join(os.getcwd(), "players list.csv")
-
-
 # deletes a given directory
 def delete_dir(d):
     if os.path.exists(d):
@@ -76,6 +73,9 @@ def run(url):
     out_name = "\n" + name + "\n"
 
     p.get_stats()
+    quit()
+
+    """
     p.calculate_m_value()
     raw_table = p.build_raw_table()  # Raw stats
     norm_table = p.build_norm_table()  # Normalized stats
@@ -99,6 +99,7 @@ def run(url):
 
     # Plot Raw and Normalized stats
     p.plot_results()
+    """
 
 
 ################################################################################

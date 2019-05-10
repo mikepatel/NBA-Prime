@@ -7,20 +7,23 @@ version: Python 3.6.5
 File Description:
 
 Notes:
-
+    - use pandas dataframe for holding stats
 
 """
 
 
 ################################################################################
 # Imports
-import numpy as np
+import os
 import re
-from bs4 import BeautifulSoup
-import urllib  # standard library
+import numpy as np
+import pandas as pd
 import urllib.request
+from bs4 import BeautifulSoup
 from prettytable import PrettyTable
 import matplotlib.pyplot as plt
+
+from constants import *
 
 
 ################################################################################
@@ -35,6 +38,7 @@ class Player:
         # player name
         self.name = self.get_name()
 
+        # bio info
         self.SEASONS = []  # year xxxx-xx
         self.AGE = []  # age at start of season
         self.TEAM = []  # NBA team
@@ -53,15 +57,22 @@ class Player:
         self.M_VALUE = []
 
         # build dict for stat categories
-        self.STAT_CATS = {
+        self.CATEGORIES = {
+            "Season": self.SEASONS,  # season
+            "Age": self.AGE,  # age
+            "Team": self.TEAM,  # team
             "Points": self.PPG,  # points
             "Rebounds": self.RPG,  # rebounds
             "Assists": self.APG,  # assists
-            "FT %": self.FT_PERCENT,  # FT%
-            "eFG %": self.EFG_PERCENT,  # eFG%
+            "FT%": self.FT_PERCENT,  # FT%
+            "eFG%": self.EFG_PERCENT,  # eFG%
             "PER": self.PER,  # PER
-            "TS %": self.TS  # TS%
+            "TS%": self.TS,  # TS%
+            "M_VALUE": self.M_VALUE  # m value
         }
+
+        # stats dataframe
+        self.stats_df = pd.DataFrame()
 
     # returns player's name
     def get_name(self):
@@ -70,84 +81,29 @@ class Player:
         name = name.strip()
         return name
 
-    # returns specified column of values
-    @staticmethod
-    def _get_column(matrix, c_idx):
-        return [row[c_idx] for row in matrix]
+    # !! CONCERNED WITH JUST REGULAR SEASON !!
+    # parse html data for stats
+    def get_stats(self):
+        self.get_reg_season_stats()  # regular season
+        self.stats_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in self.CATEGORIES.items()]))
+        print(self.stats_df)
 
-    # Finds starting index for stats values list for a player's '?-year prime'
-    # Use m_values for calculating prime windows
-    def get_prime(self, window_size):
-        avg_m_value = 0.0
-        idx = 0
+        # self.get_playoff_stats()  # playoffs
 
-        for i in range(len(self.M_VALUE)+1-window_size):
-            temp_variance = np.var(self.M_VALUE[i: i+window_size])
-            # print(i, temp_variance)
+    # all regular season stats
+    def get_reg_season_stats(self):
+        self.get_reg_season_trad_stats()  # Regular Season: seasons, age, team,
+        # points, rebounds, assists, FT%, eFG%
+        self.get_reg_season_advanced_stats()  # Regular Season: PER, TS%
 
-            if temp_variance < 0.0015:  # 0.0015
-                avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
+    # all playoff stats
+    def get_playoff_stats(self):
+        print("To do")
+        return self
 
-                if avg_candidate > avg_m_value:
-                    avg_m_value = avg_candidate
-                    idx = i
-
-        return idx  # return just the index
-
-    # reads a particular stat value from html data
-    @staticmethod
-    def read_stat_from_table(row, feature):
-        try:
-            x = float(row.find("td", {"data-stat": feature}).text.strip())
-            return x
-        except AttributeError as e:
-            if "attribute 'text'" in str(e):
-                return float(0.0)
-
-    # normalize
-    @staticmethod
-    def normalize(stat):
-        stat_min = np.min(stat)
-        stat_max = np.max(stat)
-        den = stat_max - stat_min
-
-        if den == 0.0:  # Should not divide by zero
-            for i in range(len(stat)):
-                stat[i].append(0.0)
-            return stat
-
-        else:
-            # normalize a stat value and append,
-            # producing [raw_stat, normalized_stat]
-            for i in range(len(stat)):
-                num = stat[i][0] - stat_min
-                x = num / den
-                x = np.round(x, decimals=4)
-                stat[i].append(x)
-
-            return stat
-
-    # "Per Game" table => Regular Season
-    # 'Traditional' Stats
-    def get_trad_table(self):
-        # find "Per Game" table => Regular Season
-        # 'Traditional' stats
-        table = self.soup.find("table", {"id": "per_game"})
-        table_body = table.find("tbody")
-        rows = table_body.find_all("tr")
-        return rows
-
-    # find "Advanced" table
-    # 'Advanced' stats
-    def get_advanced_table(self):
-        table = self.soup.find("table", {"id": "advanced"})
-        table_body = table.find("tbody")
-        rows = table_body.find_all("tr")
-        return rows
-
-    # Seasons, Ages, Teams
-    # Points, Rebounds, Assists, FT%, eFG%
+    #
     def get_reg_season_trad_stats(self):
+        # Seasons, Ages, Teams, Points, Rebounds, Assists, FT %, eFG %
         rows = self.get_trad_table()
 
         for row in rows:
@@ -189,18 +145,19 @@ class Player:
                 self.TEAM.append(team)
 
                 # update player's traditional stats
-                self.STAT_CATS["Points"].append([ppg])
-                self.STAT_CATS["Rebounds"].append([rpg])
-                self.STAT_CATS["Assists"].append([apg])
-                self.STAT_CATS["FT %"].append([ft_pct])
-                self.STAT_CATS["eFG %"].append([efg_pct])
+                self.CATEGORIES["Points"].append(ppg)
+                self.CATEGORIES["Rebounds"].append(rpg)
+                self.CATEGORIES["Assists"].append(apg)
+                self.CATEGORIES["FT%"].append(ft_pct)
+                self.CATEGORIES["eFG%"].append(efg_pct)
 
             except AttributeError as e:
                 if "attribute 'a'" in str(e):  # 'Season' is not a hyperlink
                     continue
 
-    # PER, TS%
+    #
     def get_reg_season_advanced_stats(self):
+        # PER, TS%
         rows = self.get_advanced_table()
         for row in rows:
             try:
@@ -213,27 +170,64 @@ class Player:
                 # print("TS: ", ts)
 
                 # update player's advanced stats
-                self.STAT_CATS["PER"].append([per])
-                self.STAT_CATS["TS %"].append([ts])
+                self.CATEGORIES["PER"].append(per)
+                self.CATEGORIES["TS%"].append(ts)
 
             except AttributeError:
                 continue  # for now
 
-    def get_reg_season_stats(self):
-        self.get_reg_season_trad_stats()  # Regular Season: seasons, age, team,
-        # points, rebounds, assists, FT%, eFG%
-        self.get_reg_season_advanced_stats()  # Regular Season: PER, TS%
+    # "Per Game" table => Regular Season
+    # 'Traditional' Stats
+    def get_trad_table(self):
+        # find "Per Game" table => Regular Season
+        # 'Traditional' stats
+        table = self.soup.find("table", {"id": "per_game"})
+        table_body = table.find("tbody")
+        rows = table_body.find_all("tr")
+        return rows
 
-    # !! CONCERNED WITH JUST REGULAR SEASON !!
-    # builds stat value lists from html data
-    def get_stats(self):
-        self.get_reg_season_stats()
+    # find "Advanced" table
+    # 'Advanced' stats
+    def get_advanced_table(self):
+        table = self.soup.find("table", {"id": "advanced"})
+        table_body = table.find("tbody")
+        rows = table_body.find_all("tr")
+        return rows
+
+    # returns specified column of values
+    @staticmethod
+    def _get_column(matrix, c_idx):
+        return [row[c_idx] for row in matrix]
+
+    # reads a particular stat value from html data
+    @staticmethod
+    def read_stat_from_table(row, feature):
+        try:
+            x = float(row.find("td", {"data-stat": feature}).text.strip())
+            return x
+        except AttributeError as e:
+            if "attribute 'text'" in str(e):
+                return float(0.0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # Calculates 'm_value' per player season
     def calculate_m_value(self):
         # normalize stats
-        for key in self.STAT_CATS:
-            self.STAT_CATS[key] = self.normalize(self.STAT_CATS[key])
+        for key in self.CATEGORIES:
+            self.CATEGORIES[key] = self.normalize(self.CATEGORIES[key])
 
         # weight values
         w1 = 0.1  # points
@@ -257,12 +251,54 @@ class Player:
             m_value = np.round(m_value, decimals=4)
             self.M_VALUE.append(m_value)
 
+    # normalize
+    @staticmethod
+    def normalize(stat):
+        stat_min = np.min(stat)
+        stat_max = np.max(stat)
+        den = stat_max - stat_min
+
+        if den == 0.0:  # Should not divide by zero
+            for i in range(len(stat)):
+                stat[i].append(0.0)
+            return stat
+
+        else:
+            # normalize a stat value and append,
+            # producing [raw_stat, normalized_stat]
+            for i in range(len(stat)):
+                num = stat[i][0] - stat_min
+                x = num / den
+                x = np.round(x, decimals=4)
+                stat[i].append(x)
+
+            return stat
+
+    # Finds starting index for stats values list for a player's '?-year prime'
+    # Use m_values for calculating prime windows
+    def get_prime(self, window_size):
+        avg_m_value = 0.0
+        idx = 0
+
+        for i in range(len(self.M_VALUE)+1-window_size):
+            temp_variance = np.var(self.M_VALUE[i: i+window_size])
+            # print(i, temp_variance)
+
+            if temp_variance < 0.0015:  # 0.0015
+                avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
+
+                if avg_candidate > avg_m_value:
+                    avg_m_value = avg_candidate
+                    idx = i
+
+        return idx  # return just the index
+
     # Field names for PrettyTable output
     @staticmethod
     def get_table_field_names():
         return [
             "Year", "Age", "Team", "Points", "Rebounds",
-            "Assists", "FT %", "eFG %", "PER", "TS %", "M_VALUE"
+            "Assists", "FT%", "eFG%", "PER", "TS%", "M_VALUE"
         ]
 
     # Raw stats table
