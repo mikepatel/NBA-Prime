@@ -33,6 +33,7 @@ class Player:
         with urllib.request.urlopen(self.url) as response:
             page = response.read()
 
+        # html soup
         self.soup = BeautifulSoup(re.sub('<!--|-->', "", str(page)), "html.parser")
 
         # player name
@@ -85,7 +86,8 @@ class Player:
     # parse html data for stats
     def get_stats(self):
         self.get_reg_season_stats()  # regular season
-        self.stats_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in self.CATEGORIES.items()]))
+
+        self.stats_df = pd.DataFrame({k: pd.Series(v) for k, v in self.CATEGORIES.items()})
         print(self.stats_df)
 
         # self.get_playoff_stats()  # playoffs
