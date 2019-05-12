@@ -190,7 +190,7 @@ class Player:
     # update stats df
     def update_stats_df(self):
         self.stats_df = pd.DataFrame({k: pd.Series(v) for k, v in self.STATS.items()})
-        print(self.stats_df)
+        #print(self.stats_df)
 
     # update normalized stats df
     def update_norm_stats_df(self):
@@ -200,6 +200,34 @@ class Player:
     def update_m_value_stats_df(self):
         print(self.m_value_df)
 
+    # calculate min-max normalization
+    @staticmethod
+    def normalize(stat_col):
+        col_name = stat_col.name
+        if col_name == "Season" or col_name == "Age" or col_name == "Team":
+            return stat_col
+        else:
+            col_min = np.min(stat_col)
+            col_max = np.max(stat_col)
+            denom = col_max - col_min
+
+            # check if denominator is 0
+            if denom == 0.0:
+                return stat_col
+            else:
+                # normalize stat value
+                numer = stat_col - col_min
+                norm_df = numer / denom
+                norm_df = np.round(norm_df, decimals=4)
+
+                return norm_df
+
+    # calculate m values
+    def calculate_m_value(self):
+        # first, normalize
+        self.norm_stats_df = self.stats_df.copy()
+        for key in self.STATS:
+            self.norm_stats_df[key] = self.normalize(self.norm_stats_df[key])
 
 
     ########################################
@@ -213,7 +241,7 @@ class Player:
     def _get_column(matrix, c_idx):
         return [row[c_idx] for row in matrix]
 
-
+    """
     # Calculates 'm_value' per player season
     def calculate_m_value(self):
         # normalize stats
@@ -242,28 +270,7 @@ class Player:
             m_value = np.round(m_value, decimals=4)
             self.M_VALUE.append(m_value)
 
-    # normalize
-    @staticmethod
-    def normalize(stat):
-        stat_min = np.min(stat)
-        stat_max = np.max(stat)
-        den = stat_max - stat_min
-
-        if den == 0.0:  # Should not divide by zero
-            for i in range(len(stat)):
-                stat[i].append(0.0)
-            return stat
-
-        else:
-            # normalize a stat value and append,
-            # producing [raw_stat, normalized_stat]
-            for i in range(len(stat)):
-                num = stat[i][0] - stat_min
-                x = num / den
-                x = np.round(x, decimals=4)
-                stat[i].append(x)
-
-            return stat
+    """
 
     # Finds starting index for stats values list for a player's '?-year prime'
     # Use m_values for calculating prime windows
