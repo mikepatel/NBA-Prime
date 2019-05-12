@@ -17,5 +17,7 @@ import os
 
 
 ################################################################################
-OUTPUT_DIR = os.path.join(os.getcwd(), "Results")
-PLAYERS_CSV = os.path.join(os.getcwd(), "players list.csv")
+PLAYERS_CSV = os.path.join(os.getcwd(), "players list.csv")  # input
+OUTPUT_DIR = os.path.join(os.getcwd(), "Results")  # output
+
+BREAKLINE = "\n####################################################################################"

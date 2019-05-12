@@ -33,47 +33,31 @@ class Player:
         with urllib.request.urlopen(self.url) as response:
             page = response.read()
 
+        page = re.sub('<!--|-->', "", str(page))
+
         # html soup
-        self.soup = BeautifulSoup(re.sub('<!--|-->', "", str(page)), "html.parser")
+        self.soup = BeautifulSoup(page, "html.parser")
 
         # player name
         self.name = self.get_name()
 
-        # bio info
-        self.SEASONS = []  # year xxxx-xx
-        self.AGE = []  # age at start of season
-        self.TEAM = []  # NBA team
-
-        # stats of interest
-        self.PPG = []  # points per
-        self.RPG = []  # rebounds per
-        self.APG = []  # assists per
-        self.FT_PERCENT = []  # free throw percentage per
-        self.EFG_PERCENT = []  # effective field goal percentage per
-        self.PER = []  # player efficiency rating per
-        self.TS = []  # true shooting percentage per
-
-        # custom statistic
-        # calculated for each season
-        self.M_VALUE = []
-
-        # build dict for stat categories
-        self.CATEGORIES = {
-            "Season": self.SEASONS,  # season
-            "Age": self.AGE,  # age
-            "Team": self.TEAM,  # team
-            "Points": self.PPG,  # points
-            "Rebounds": self.RPG,  # rebounds
-            "Assists": self.APG,  # assists
-            "FT%": self.FT_PERCENT,  # FT%
-            "eFG%": self.EFG_PERCENT,  # eFG%
-            "PER": self.PER,  # PER
-            "TS%": self.TS,  # TS%
-            "M_VALUE": self.M_VALUE  # m value
+        # build dict for stats
+        self.STATS = {
+            "Season": [],  # season, xxxx-xx
+            "Age": [],  # age at start of season
+            "Team": [],  # team
+            "Points": [],  # points per game
+            "Rebounds": [],  # rebounds per game
+            "Assists": [],  # assists per game
+            "FT%": [],  # FT% per game
+            "eFG%": [],  # eFG% per game
+            "PER": [],  # PER per game
+            "TS%": [],  # TS% per game
+            "M_VALUE": []  # m value, custom statistic calculated for each season
         }
 
         # initialize stats dataframes
-        self.raw_stats_df = pd.DataFrame()
+        self.stats_df = pd.DataFrame()
         self.norm_stats_df = pd.DataFrame()
         self.m_value_df = pd.DataFrame()
 
@@ -84,32 +68,20 @@ class Player:
         name = name.strip()
         return name
 
-    # update raw stats df
-    def update_raw_stats_df(self):
-        self.raw_stats_df = pd.DataFrame({k: pd.Series(v) for k, v in self.CATEGORIES.items()})
-        print(self.raw_stats_df)
-
-    # update normalized stats df
-    def update_norm_stats_df(self):
-        print()
-
-    # update m_value stats df
-    def update_m_value_stats_df(self):
-        print()
-
     # !! CONCERNED WITH JUST REGULAR SEASON FOR RIGHT NOW !!
     # parse html data for stats
     def get_stats(self):
-        self.get_reg_season_stats()  # regular season
-        self.update_raw_stats_df()
+        # regular season
+        self.get_reg_season_stats()
+        self.update_stats_df()
 
-        # self.get_playoff_stats()  # playoffs
+        # playoffs
+        # self.get_playoff_stats()
 
     # all regular season stats
     def get_reg_season_stats(self):
-        self.get_reg_season_trad_stats()  # Regular Season: seasons, age, team,
-        # points, rebounds, assists, FT%, eFG%
-        self.get_reg_season_advanced_stats()  # Regular Season: PER, TS%
+        self.get_reg_season_trad_stats()  # traditional stats
+        self.get_reg_season_advanced_stats()  # advanced stats
 
     # all playoff stats
     def get_playoff_stats(self):
@@ -117,9 +89,9 @@ class Player:
         return self
 
     # regular season traditional stats
+    # Seasons, Ages, Teams, Points, Rebounds, Assists, FT %, eFG %
     def get_reg_season_trad_stats(self):
-        # Seasons, Ages, Teams, Points, Rebounds, Assists, FT %, eFG %
-        rows = self.get_trad_table()
+        rows = self.get_table_rows(table_type="regular season traditional")
 
         for row in rows:
             try:
@@ -155,25 +127,25 @@ class Player:
                 # print("eFG%: ", efg_pct)
 
                 # update player's bio information
-                self.SEASONS.append(season)
-                self.AGE.append(age)
-                self.TEAM.append(team)
+                self.STATS["Season"].append(season)
+                self.STATS["Age"].append(age)
+                self.STATS["Team"].append(team)
 
                 # update player's traditional stats
-                self.CATEGORIES["Points"].append(ppg)
-                self.CATEGORIES["Rebounds"].append(rpg)
-                self.CATEGORIES["Assists"].append(apg)
-                self.CATEGORIES["FT%"].append(ft_pct)
-                self.CATEGORIES["eFG%"].append(efg_pct)
+                self.STATS["Points"].append(ppg)
+                self.STATS["Rebounds"].append(rpg)
+                self.STATS["Assists"].append(apg)
+                self.STATS["FT%"].append(ft_pct)
+                self.STATS["eFG%"].append(efg_pct)
 
             except AttributeError as e:
                 if "attribute 'a'" in str(e):  # 'Season' is not a hyperlink
                     continue
 
     # regular season advanced stats
+    # PER, TS%
     def get_reg_season_advanced_stats(self):
-        # PER, TS%
-        rows = self.get_advanced_table()
+        rows = self.get_table_rows(table_type="regular season advanced")
         for row in rows:
             try:
                 # PER
@@ -185,34 +157,25 @@ class Player:
                 # print("TS: ", ts)
 
                 # update player's advanced stats
-                self.CATEGORIES["PER"].append(per)
-                self.CATEGORIES["TS%"].append(ts)
+                self.STATS["PER"].append(per)
+                self.STATS["TS%"].append(ts)
 
             except AttributeError:
                 continue  # for now
 
-    # "Per Game" table => Regular Season
-    # 'Traditional' Stats
-    def get_trad_table(self):
-        # find "Per Game" table => Regular Season
-        # 'Traditional' stats
-        table = self.soup.find("table", {"id": "per_game"})
+    # scrape and return table data rows
+    def get_table_rows(self, table_type):
+        if table_type == "regular season traditional":
+            table = self.soup.find("table", {"id": "per_game"})  # "Per Game" table => Regular Season
+        elif table_type == "regular season advanced":
+            table = self.soup.find("table", {"id": "advanced"})  # find "Advanced" table
+        else:
+            print("\nCannot find table: {}".format(table_type))
+            quit()
+
         table_body = table.find("tbody")
         rows = table_body.find_all("tr")
         return rows
-
-    # find "Advanced" table
-    # 'Advanced' stats
-    def get_advanced_table(self):
-        table = self.soup.find("table", {"id": "advanced"})
-        table_body = table.find("tbody")
-        rows = table_body.find_all("tr")
-        return rows
-
-    # returns specified column of values
-    @staticmethod
-    def _get_column(matrix, c_idx):
-        return [row[c_idx] for row in matrix]
 
     # reads a particular stat value from html data
     @staticmethod
@@ -224,18 +187,31 @@ class Player:
             if "attribute 'text'" in str(e):
                 return float(0.0)
 
+    # update stats df
+    def update_stats_df(self):
+        self.stats_df = pd.DataFrame({k: pd.Series(v) for k, v in self.STATS.items()})
+        print(self.stats_df)
+
+    # update normalized stats df
+    def update_norm_stats_df(self):
+        print(self.norm_stats_df)
+
+    # update m_value stats df
+    def update_m_value_stats_df(self):
+        print(self.m_value_df)
+
+
+
+    ########################################
 
 
 
 
 
-
-
-
-
-
-
-
+    # returns specified column of values
+    @staticmethod
+    def _get_column(matrix, c_idx):
+        return [row[c_idx] for row in matrix]
 
 
     # Calculates 'm_value' per player season
