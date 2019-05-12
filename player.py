@@ -30,6 +30,7 @@ from constants import *
 class Player:
     def __init__(self, url):
         self.url = url
+
         with urllib.request.urlopen(self.url) as response:
             page = response.read()
 
@@ -67,6 +68,17 @@ class Player:
         name, _ = name.split("Stats")
         name = name.strip()
         return name
+
+    # save tables to csv
+    def save_results(self):
+        # create directory for player results
+        directory = os.path.join(OUTPUT_DIR, self.name)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        self.stats_df.to_csv(os.path.join(directory, self.name + "_Raw_Results.csv"), index=None)
+        self.norm_stats_df.to_csv(os.path.join(directory, self.name + "_Normalized_Results.csv"), index=None)
+        self.m_value_df.to_csv(os.path.join(directory, self.name + "_Prime_Results.csv"), index=None)
 
     # !! CONCERNED WITH JUST REGULAR SEASON FOR RIGHT NOW !!
     # parse html data for stats

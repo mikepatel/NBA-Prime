@@ -67,15 +67,19 @@ def get_player_urls():
 def run(url):
     p = Player(url)
 
-    # Player name
-    name = p.get_name()
-    #out_name = "\n" + name + "\n"
-
     p.get_stats()
-    quit()
+    p.calculate_m_value()
+    p.get_prime(3)
+
+    #print(p.name)
+    #print(p.stats_df)
+    #print(p.norm_stats_df)
+    #print(p.m_value_df)
+
+    p.save_results()
+    #quit()
 
     """
-    p.calculate_m_value()
     raw_table = p.build_raw_table()  # Raw stats
     norm_table = p.build_norm_table()  # Normalized stats
 
@@ -106,6 +110,8 @@ def run(url):
 if __name__ == "__main__":
     # initial cleanup
     delete_dir(OUTPUT_DIR)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
     # get list of Basketball Reference URLs
     URLS = get_player_urls()
