@@ -196,10 +196,6 @@ class Player:
         for key in self.STATS:
             self.norm_stats_df[key] = self.normalize(self.stats_df[key])
 
-    # update m_value stats df
-    def update_m_value_stats_df(self):
-        print(self.m_value_df)
-
     # calculate min-max normalization
     @staticmethod
     def normalize(stat_col):
@@ -251,27 +247,21 @@ class Player:
             self.norm_stats_df.loc[index, "M_VALUE"] = m_value
             self.stats_df.loc[index, "M_VALUE"] = m_value
 
-    #
+    # find player's prime window
     def get_prime(self, window_size):
         avg_m_value = 0.0
         idx = 0
 
-        var_series = self.norm_stats_df["M_VALUE"].rolling(window_size).var()
-        mean_series = self.norm_stats_df["M_VALUE"].rolling(window_size).mean()
+        var_series = self.norm_stats_df["M_VALUE"].rolling(window_size).var()  # variance
+        mean_series = self.norm_stats_df["M_VALUE"].rolling(window_size).mean()  # mean
 
         for index, value in var_series.iteritems():
-            if value < 0.004:
-                if mean_series[index] > avg_m_value:
-                    avg_m_value = mean_series[index]
-                    idx = index
+            #if value < 0.004:
+            if mean_series[index] > avg_m_value:
+                avg_m_value = mean_series[index]
+                idx = index
 
-        """
-        for i in range(window_size-1, len(var_series)):
-            if var_series[i] < 0.0015:
-                if mean_series[i] > avg_m_value:
-                    avg_m_value = mean_series[i]
-                    idx = i-window_size+1
-        """
+        # update m_value stats df
         self.m_value_df = self.stats_df.loc[idx-window_size+1:idx]
 
 
