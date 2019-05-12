@@ -190,11 +190,11 @@ class Player:
     # update stats df
     def update_stats_df(self):
         self.stats_df = pd.DataFrame({k: pd.Series(v) for k, v in self.STATS.items()})
-        #print(self.stats_df)
 
     # update normalized stats df
     def update_norm_stats_df(self):
-        print(self.norm_stats_df)
+        for key in self.STATS:
+            self.norm_stats_df[key] = self.normalize(self.stats_df[key])
 
     # update m_value stats df
     def update_m_value_stats_df(self):
@@ -224,11 +224,45 @@ class Player:
 
     # calculate m values
     def calculate_m_value(self):
-        # first, normalize
-        self.norm_stats_df = self.stats_df.copy()
-        for key in self.STATS:
-            self.norm_stats_df[key] = self.normalize(self.norm_stats_df[key])
+        # normalize first
+        self.update_norm_stats_df()
 
+        # weight values
+        w1 = 0.1  # points
+        w2 = 0.1  # rebounds
+        w3 = 0.1  # assists
+        w4 = 0.1  # FT percentage
+        w5 = 0.1  # eFG percentage
+        w6 = 0.1  # PER
+        w7 = 0.1  # TS
+
+        for index, row in self.norm_stats_df.iterrows():
+            m_value = np.sum([
+                w1*row["Points"],
+                w2*row["Rebounds"],
+                w3*row["Assists"],
+                w4*row["FT%"],
+                w5*row["eFG%"],
+                w6*row["PER"],
+                w7*row["TS%"]
+            ])
+            m_value = np.round(m_value, decimals=4)
+            self.norm_stats_df.loc[index, "M_VALUE"] = m_value
+
+        """
+        for i in range(len(self.norm_stats_df["Season"])):
+            m_value = np.sum([
+                w1*self.norm_stats_df["Points"][i],
+                w2*self.norm_stats_df["Rebounds"][i],
+                w3*self.norm_stats_df["Assists"][i],
+                w4*self.norm_stats_df["FT%"][i],
+                w5*self.norm_stats_df["eFG%"][i],
+                w6*self.norm_stats_df["PER"][i],
+                w7*self.norm_stats_df["TS%"][i]
+            ])
+            m_value = np.round(m_value, decimals=4)
+            self.norm_stats_df["M_VALUE"][i] = m_value
+        """
 
     ########################################
 
@@ -248,14 +282,7 @@ class Player:
         for key in self.CATEGORIES:
             self.CATEGORIES[key] = self.normalize(self.CATEGORIES[key])
 
-        # weight values
-        w1 = 0.1  # points
-        w2 = 0.1  # rebounds
-        w3 = 0.1  # assists
-        w4 = 0.1  # FT percentage
-        w5 = 0.1  # eFG percentage
-        w6 = 0.1  # PER
-        w7 = 0.1  # TS
+        
 
         for i in range(len(self.SEASONS)):
             m_value = np.sum([
