@@ -236,6 +236,7 @@ class Player:
         w6 = 0.1  # PER
         w7 = 0.1  # TS
 
+        # calculate an m value for each season
         for index, row in self.norm_stats_df.iterrows():
             m_value = np.sum([
                 w1*row["Points"],
@@ -248,21 +249,33 @@ class Player:
             ])
             m_value = np.round(m_value, decimals=4)
             self.norm_stats_df.loc[index, "M_VALUE"] = m_value
+            self.stats_df.loc[index, "M_VALUE"] = m_value
+
+    #
+    def get_prime(self, window_size):
+        avg_m_value = 0.0
+        idx = 0
+
+        var_series = self.norm_stats_df["M_VALUE"].rolling(window_size).var()
+        mean_series = self.norm_stats_df["M_VALUE"].rolling(window_size).mean()
+
+        for index, value in var_series.iteritems():
+            if value < 0.004:
+                if mean_series[index] > avg_m_value:
+                    avg_m_value = mean_series[index]
+                    idx = index
 
         """
-        for i in range(len(self.norm_stats_df["Season"])):
-            m_value = np.sum([
-                w1*self.norm_stats_df["Points"][i],
-                w2*self.norm_stats_df["Rebounds"][i],
-                w3*self.norm_stats_df["Assists"][i],
-                w4*self.norm_stats_df["FT%"][i],
-                w5*self.norm_stats_df["eFG%"][i],
-                w6*self.norm_stats_df["PER"][i],
-                w7*self.norm_stats_df["TS%"][i]
-            ])
-            m_value = np.round(m_value, decimals=4)
-            self.norm_stats_df["M_VALUE"][i] = m_value
+        for i in range(window_size-1, len(var_series)):
+            if var_series[i] < 0.0015:
+                if mean_series[i] > avg_m_value:
+                    avg_m_value = mean_series[i]
+                    idx = i-window_size+1
         """
+        self.m_value_df = self.stats_df.loc[idx-window_size+1:idx]
+
+
+
 
     ########################################
 
@@ -274,28 +287,6 @@ class Player:
     @staticmethod
     def _get_column(matrix, c_idx):
         return [row[c_idx] for row in matrix]
-
-    """
-    # Calculates 'm_value' per player season
-    def calculate_m_value(self):
-        # normalize stats
-        for key in self.CATEGORIES:
-            self.CATEGORIES[key] = self.normalize(self.CATEGORIES[key])
-
-        
-
-        for i in range(len(self.SEASONS)):
-            m_value = np.sum([
-                w1*self.PPG[i][1],
-                w2*self.RPG[i][1],
-                w3*self.APG[i][1],
-                w4*self.FT_PERCENT[i][1],
-                w7 * self.EFG_PERCENT[i][1],
-                w5*self.PER[i][1],
-                w6*self.TS[i][1]
-            ])
-            m_value = np.round(m_value, decimals=4)
-            self.M_VALUE.append(m_value)
 
     """
 
@@ -445,3 +436,4 @@ class Player:
 
         with open(out_file, "a") as f:
             f.write(table)
+    """
