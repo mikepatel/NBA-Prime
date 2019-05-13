@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 import urllib.request
 from bs4 import BeautifulSoup
-from prettytable import PrettyTable
+# from prettytable import PrettyTable
 import matplotlib.pyplot as plt
 
 from constants import *
@@ -30,7 +30,6 @@ from constants import *
 class Player:
     def __init__(self, url):
         self.url = url
-
         with urllib.request.urlopen(self.url) as response:
             page = response.read()
 
@@ -62,23 +61,15 @@ class Player:
         self.norm_stats_df = pd.DataFrame()
         self.m_value_df = pd.DataFrame()
 
+        # create a directory for results
+        self.directory = self.create_player_directory()
+
     # return player's name
     def get_name(self):
         name = self.soup.title.text.strip()
         name, _ = name.split("Stats")
         name = name.strip()
         return name
-
-    # save tables to csv
-    def save_results(self):
-        # create directory for player results
-        directory = os.path.join(OUTPUT_DIR, self.name)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        self.stats_df.to_csv(os.path.join(directory, self.name + "_Raw_Results.csv"), index=None)
-        self.norm_stats_df.to_csv(os.path.join(directory, self.name + "_Normalized_Results.csv"), index=None)
-        self.m_value_df.to_csv(os.path.join(directory, self.name + "_Prime_Results.csv"), index=None)
 
     # !! CONCERNED WITH JUST REGULAR SEASON FOR RIGHT NOW !!
     # parse html data for stats
@@ -177,12 +168,17 @@ class Player:
 
     # scrape and return table data rows
     def get_table_rows(self, table_type):
+        table = None
+
         if table_type == "regular season traditional":
             table = self.soup.find("table", {"id": "per_game"})  # "Per Game" table => Regular Season
         elif table_type == "regular season advanced":
             table = self.soup.find("table", {"id": "advanced"})  # find "Advanced" table
         else:
             print("\nCannot find table: {}".format(table_type))
+            quit()
+
+        if table is None:
             quit()
 
         table_body = table.find("tbody")
@@ -210,21 +206,21 @@ class Player:
 
     # calculate min-max normalization
     @staticmethod
-    def normalize(stat_col):
-        col_name = stat_col.name
+    def normalize(column):
+        col_name = column.name
         if col_name == "Season" or col_name == "Age" or col_name == "Team":
-            return stat_col
+            return column
         else:
-            col_min = np.min(stat_col)
-            col_max = np.max(stat_col)
+            col_min = np.min(column)
+            col_max = np.max(column)
             denom = col_max - col_min
 
             # check if denominator is 0
             if denom == 0.0:
-                return stat_col
+                return column
             else:
                 # normalize stat value
-                numer = stat_col - col_min
+                numer = column - col_min
                 norm_df = numer / denom
                 norm_df = np.round(norm_df, decimals=4)
 
@@ -268,7 +264,7 @@ class Player:
         mean_series = self.norm_stats_df["M_VALUE"].rolling(window_size).mean()  # mean
 
         for index, value in var_series.iteritems():
-            #if value < 0.004:
+            # if value < 0.004:
             if mean_series[index] > avg_m_value:
                 avg_m_value = mean_series[index]
                 idx = index
@@ -276,166 +272,49 @@ class Player:
         # update m_value stats df
         self.m_value_df = self.stats_df.loc[idx-window_size+1:idx]
 
+    # create directory for player results
+    def create_player_directory(self):
+        directory = os.path.join(OUTPUT_DIR, self.name)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
+        return directory
 
+    # save tables to csv
+    def save_results(self):
+        self.stats_df.to_csv(os.path.join(self.directory, self.name + "_Raw_Results.csv"), index=None)
+        self.norm_stats_df.to_csv(os.path.join(self.directory, self.name + "_Normalized_Results.csv"), index=None)
+        self.m_value_df.to_csv(os.path.join(self.directory, self.name + "_Prime_Results.csv"), index=None)
 
-    ########################################
-
-
-
-
-
-    # returns specified column of values
-    @staticmethod
-    def _get_column(matrix, c_idx):
-        return [row[c_idx] for row in matrix]
-
-    """
-
-    # Finds starting index for stats values list for a player's '?-year prime'
-    # Use m_values for calculating prime windows
-    def get_prime(self, window_size):
-        avg_m_value = 0.0
-        idx = 0
-
-        for i in range(len(self.M_VALUE)+1-window_size):
-            temp_variance = np.var(self.M_VALUE[i: i+window_size])
-            # print(i, temp_variance)
-
-            if temp_variance < 0.0015:  # 0.0015
-                avg_candidate = np.mean(self.M_VALUE[i: i+window_size])
-
-                if avg_candidate > avg_m_value:
-                    avg_m_value = avg_candidate
-                    idx = i
-
-        return idx  # return just the index
-
-    # Field names for PrettyTable output
-    @staticmethod
-    def get_table_field_names():
-        return [
-            "Year", "Age", "Team", "Points", "Rebounds",
-            "Assists", "FT%", "eFG%", "PER", "TS%", "M_VALUE"
-        ]
-
-    # Raw stats table
-    def build_raw_table(self):
-        raw_table = PrettyTable()
-        raw_table.field_names = self.get_table_field_names()
-
-        for i in range(len(self.SEASONS)):
-            raw_table.add_row([
-                self.SEASONS[i],
-                self.AGE[i],
-                self.TEAM[i],
-                self.PPG[i][0],
-                self.RPG[i][0],
-                self.APG[i][0],
-                self.FT_PERCENT[i][0],
-                self.EFG_PERCENT[i][0],
-                self.PER[i][0],
-                self.TS[i][0],
-                self.M_VALUE[i]])
-
-        out_raw_table = "\nRaw\n" + str(raw_table) + "\n"
-        return out_raw_table
-
-    # Normalized stats table
-    def build_norm_table(self):
-        norm_table = PrettyTable()
-        norm_table.field_names = self.get_table_field_names()
-
-        for i in range(len(self.SEASONS)):
-            norm_table.add_row([
-                self.SEASONS[i],
-                self.AGE[i],
-                self.TEAM[i],
-                self.PPG[i][1],
-                self.RPG[i][1],
-                self.APG[i][1],
-                self.FT_PERCENT[i][1],
-                self.EFG_PERCENT[i][1],
-                self.PER[i][1],
-                self.TS[i][1],
-                self.M_VALUE[i]])
-
-        out_norm_table = "\nNormalized\n" + str(norm_table) + "\n"
-        return out_norm_table
-
-    # M Value table
-    def build_m_value_table(self, window_size):
-        idx = self.get_prime(window_size=window_size)
-
-        name = self.name
-        seasons = self.SEASONS[idx: idx + window_size]
-        ages = self.AGE[idx: idx + window_size]
-        teams = self.TEAM[idx: idx + window_size]
-        m_values = self.M_VALUE[idx: idx + window_size]
-
-        prime_table = PrettyTable()
-        prime_table.field_names = ["Year", "Age", "Team", "M_VALUE"]
-
-        for i in range(len(seasons)):
-            prime_table.add_row([seasons[i], ages[i], teams[i], m_values[i]])
-
-        table_title = "\n" + name + " " + str(window_size) + "-year prime\n"
-        out_prime_table = table_title + str(prime_table) + "\n"
-        return out_prime_table
-
-    # Create output directory for each player
-    def get_player_dir(self):
-        name = self.name
-        player_output_dir = os.path.join(OUTPUT_DIR, name)
-        if not os.path.exists(player_output_dir):
-            os.makedirs(player_output_dir)
-
-        return player_output_dir
-
-    # Plot raw stats and normalized stats
+    # visualize the results
     def plot_results(self):
-        name = self.name
-        player_dir = self.get_player_dir()
-
-        stat_types = {
-            "Raw": 0,
-            "Normalized": 1
+        plot_types = {
+            "Raw": self.stats_df,
+            "Normalized": self.norm_stats_df
         }
 
-        for st in stat_types:
-            stat_col = stat_types[st]
-
-            # create a plot figure with subplots
+        for key, value_df in plot_types.items():
             plt.figure(figsize=(20, 10))
-            plt.suptitle(name + "_" + str(st))
+            plt.suptitle(self.name + "_" + key)
 
             subplot_idx = 1
-            for key in self.STAT_CATS:
-                stat = self.STAT_CATS[key]
 
-                plt.subplot(3, 3, subplot_idx)
-                plt.plot(self.SEASONS, self._get_column(stat, stat_col))
-                plt.title(key)
-                plt.xticks(rotation=45)
-                plt.subplots_adjust(hspace=0.5)
-                plt.grid()
+            for column in value_df:
+                if column == "Season" or column == "Age" or column == "Team":
+                    continue
+
+                else:
+                    plt.subplot(3, 3, subplot_idx)
+                    plt.plot(value_df["Season"], value_df[column])
+                    plt.title(column)
+                    plt.xticks(rotation=45)
+                    plt.grid()
+                    plt.subplots_adjust(hspace=0.5)
 
                 subplot_idx += 1
 
             # save plot
-            plot_filename = name + "_Plots_" + str(st) + ".png"
-            plot_file = os.path.join(player_dir, plot_filename)
+            plot_filename = self.name + "_Plots_" + str(key) + ".png"
+            plot_file = os.path.join(self.directory, plot_filename)
             plt.savefig(plot_file)
             plt.close()
-
-    # Write table output to file
-    def save_tables(self, table):
-        name = self.name
-        player_dir = self.get_player_dir()
-
-        table_filename = name + "_Table Results.txt"
-        out_file = os.path.join(player_dir, table_filename)
-
-        with open(out_file, "a") as f:
-            f.write(table)
-    """

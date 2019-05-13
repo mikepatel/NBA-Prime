@@ -69,40 +69,15 @@ def run(url):
 
     p.get_stats()
     p.calculate_m_value()
-    p.get_prime(3)
+    p.get_prime(window_size=3)
 
-    #print(p.name)
-    #print(p.stats_df)
-    #print(p.norm_stats_df)
-    #print(p.m_value_df)
+    # print(p.name)
+    # print(p.stats_df)
+    # print(p.norm_stats_df)
+    # print(p.m_value_df)
 
     p.save_results()
-    #quit()
-
-    """
-    raw_table = p.build_raw_table()  # Raw stats
-    norm_table = p.build_norm_table()  # Normalized stats
-
-    # ?-year Prime stats
-    window_size = 3
-    prime_table = p.build_m_value_table(window_size)  # m_values
-
-    # print out table results at end
-    output = [
-        # break_line,
-        out_name,
-        raw_table,
-        norm_table,
-        prime_table
-    ]
-    output = "".join(output)
-
-    # Write table output to file
-    p.save_tables(output)
-
-    # Plot Raw and Normalized stats
     p.plot_results()
-    """
 
 
 ################################################################################
