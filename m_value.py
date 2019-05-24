@@ -34,9 +34,10 @@ Notes:
 ################################################################################
 # Imports
 import os
-import multiprocessing
+from multiprocessing import Pool
 import shutil
 import pandas as pd
+import time
 
 from player import Player  # custom class
 from constants import *
@@ -83,6 +84,9 @@ def run(url):
 ################################################################################
 # Main
 if __name__ == "__main__":
+    # start time
+    start = time.time()
+
     # initial cleanup
     delete_dir(OUTPUT_DIR)
     if not os.path.exists(OUTPUT_DIR):
@@ -92,6 +96,10 @@ if __name__ == "__main__":
     URLS = get_player_urls()
 
     # multiprocessing
-    processes = [multiprocessing.Process(target=run, args=(url,)) for url in URLS]
-    for process in processes:
-        process.start()
+    p = Pool(processes=len(URLS))
+    p.map(run, URLS)
+    p.close()
+
+    # runtime
+    runtime = time.time() - start
+    print("Runtime: {:.4f} seconds".format(runtime))
