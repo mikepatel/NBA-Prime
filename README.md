@@ -13,4 +13,5 @@ $ python m_value.py
 ```
 
 ## Results
-* Coming Soon!
+* Preliminary results can be found in [Results](https://github.com/mikepatel/NBA-Prime/tree/master/Results)
+* Visualization Coming Soon!
