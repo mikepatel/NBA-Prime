@@ -1,0 +1,55 @@
+################################################################################
+# OVERVIEW
+- Gathering my own data via web scraping
+- Communication => Visualization (Jupyter Notebook)
+- HitP tie-in
+
+################################################################################
+# DATA SET
+- Basketball-Reference "https://www.basketball-reference.com/"
+- unstructured?
+- determine the greatest basketball play of all time (images) then recreate (GANs)
+    - text 2 image GAN, recreate/re-enact/re-animate basketball sequences for podcast video
+- BeautifulSoup4.7.1
+    - prettify()
+- csv, api
+- use data from Internet
+
+################################################################################
+# TO-DO
+- make over the top GUI to select player and stat category
+- regular season vs playoffs
+- research per36, per100poss, TS%, etc.
+- make TF app to recognize players
+    - create image dataset of my top 5 players
+    - create ML model and app that identifies if player is in top 5
+        - if Yes, identify ranking
+        - if No, display funny message
+
+################################################################################
+# QUESTIONS
+- how to address injury years? MJ retirement, AD minutes restriction, etc.
+- what if season length changes?
+- how to compare eras?
+
+################################################################################
+# NOTES
+- stats.NBA.com
+    - specifying the start and end points of the window
+- Basketball Reference
+    - "g" : per game
+    - "mp" : per 36
+    - "poss" : per 100 poss
+- Tkinter = Python GUI library, https://www.tutorialspoint.com/python/python_gui_programming.htm
+    - create GUI app main window
+    - add widgets to GUI app
+        - widgets = GUI elements
+    - main event loop to respond to user actions, user I/O (event-driven OOP)
+    - https://python-textbok.readthedocs.io/en/1.0/Introduction_to_GUI_Programming.html
+
+
+'requests'
+Data = requests.get(url)
+Data = data.text
+
+
