@@ -9,7 +9,7 @@
 
 ## Instructions
 ```
-$ python m_value.py
+$ python model.py
 ```
 
 ## Results
