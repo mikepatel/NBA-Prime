@@ -17,5 +17,5 @@ import os
 
 
 ################################################################################
-PLAYERS_CSV = os.path.join(os.getcwd(), "players list.csv")  # input
+PLAYERS_CSV = os.path.join(os.getcwd(), "data\\players list.csv")  # input
 OUTPUT_DIR = os.path.join(os.getcwd(), "Results")  # output

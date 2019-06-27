@@ -2,7 +2,7 @@
 Michael Patel
 April 2019
 
-version: Python 3.6.5
+Python 3.6.5
 
 File Description:
 
@@ -72,11 +72,6 @@ def run(url):
     p.calculate_m_value()
     p.get_prime(window_size=3)
 
-    # print(p.name)
-    # print(p.stats_df)
-    # print(p.norm_stats_df)
-    # print(p.m_value_df)
-
     p.save_results()
     p.plot_results()
 
@@ -96,9 +91,9 @@ if __name__ == "__main__":
     URLS = get_player_urls()
 
     # multiprocessing
-    p = Pool(processes=len(URLS))
-    p.map(run, URLS)
-    p.close()
+    processes = Pool(processes=len(URLS))
+    processes.map(run, URLS)
+    processes.close()
 
     # runtime
     runtime = time.time() - start
