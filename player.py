@@ -71,6 +71,14 @@ class Player:
         name = name.strip()
         return name
 
+    # create directory for player results
+    def create_player_directory(self):
+        directory = os.path.join(OUTPUT_DIR, self.name)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        return directory
+
     # !! CONCERNED WITH JUST REGULAR SEASON FOR RIGHT NOW !!
     # parse html data for stats
     def get_stats(self):
@@ -209,19 +217,19 @@ class Player:
     def normalize(column):
         col_name = column.name
         if col_name == "Season" or col_name == "Age" or col_name == "Team":
-            return column
+            return column  # does not make sense to normalize
         else:
-            col_min = np.min(column)
-            col_max = np.max(column)
-            denom = col_max - col_min
+            col_min = np.min(column)  # min
+            col_max = np.max(column)  # max
+            denom = col_max - col_min  # denominator
 
             # check if denominator is 0
             if denom == 0.0:
                 return column
             else:
                 # normalize stat value
-                numer = column - col_min
-                norm_df = numer / denom
+                numer = column - col_min  # numerator
+                norm_df = numer / denom  # normalization
                 norm_df = np.round(norm_df, decimals=4)
 
                 return norm_df
@@ -252,8 +260,8 @@ class Player:
                 w7*row["TS%"]
             ])
             m_value = np.round(m_value, decimals=4)
-            self.norm_stats_df.loc[index, "M_VALUE"] = m_value
-            self.stats_df.loc[index, "M_VALUE"] = m_value
+            self.stats_df.loc[index, "M_VALUE"] = m_value  # add m_value column to stats_df
+            self.norm_stats_df.loc[index, "M_VALUE"] = m_value  # add m_value column to norm df
 
     # find player's prime window
     def get_prime(self, window_size):
@@ -271,14 +279,6 @@ class Player:
 
         # update m_value stats df
         self.m_value_df = self.stats_df.loc[idx-window_size+1:idx]
-
-    # create directory for player results
-    def create_player_directory(self):
-        directory = os.path.join(OUTPUT_DIR, self.name)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        return directory
 
     # save tables to csv
     def save_results(self):

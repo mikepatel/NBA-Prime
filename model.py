@@ -81,6 +81,7 @@ def run(url):
 if __name__ == "__main__":
     # start time
     start = time.time()
+    print("Running...")
 
     # initial cleanup
     delete_dir(OUTPUT_DIR)
@@ -97,4 +98,5 @@ if __name__ == "__main__":
 
     # runtime
     runtime = time.time() - start
+    print("...Finished!")
     print("Runtime: {:.4f} seconds".format(runtime))
