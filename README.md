@@ -16,5 +16,17 @@ $ python model.py
 ```
 
 ## Results
-* Preliminary results can be found in [Results](https://github.com/mikepatel/NBA-Prime/tree/master/Results)
 * Visualization Coming Soon!
+* Preliminary results can be found in [Results](https://github.com/mikepatel/NBA-Prime/tree/master/Results)
+
+LeBron James Career Stats
+![LBJ Raw Stats](https://github.com/mikepatel/NBA-Prime/blob/master/Results/LeBron%20James/LeBron%20James_Plots_Raw.png)
+
+
+What is LeBron James' Prime? Check the table below to find out!
+
+|Season |Age|Team|Points|Rebounds|Assists|FT%  |eFG% |PER |TS%  |M_VALUE|
+|-------|---|----|------|--------|-------|-----|-----|----|-----|-------|
+|2011-12|27 |MIA |27.1  |7.9     |6.2    |0.771|0.554|30.7|0.605|0.4707 |
+|2012-13|28 |MIA |26.8  |8.0     |7.3    |0.753|0.603|31.6|0.64 |0.5467 |
+|2013-14|29 |MIA |27.1  |6.9     |6.3    |0.75 |0.61 |29.3|0.649|0.4727 |
