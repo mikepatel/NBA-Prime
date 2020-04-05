@@ -11,6 +11,11 @@ import os
 from multiprocessing import Pool
 import shutil
 import pandas as pd
+import urllib.request
+from bs4 import BeautifulSoup
+import matplotlib.pyplot as plt
+
+from MVP
 
 
 ################################################################################
@@ -40,6 +45,9 @@ def get_player_urls():
 
 # collect data
 def run(url):
+    # get stats
+
+    # save plots
 
 
 ################################################################################
