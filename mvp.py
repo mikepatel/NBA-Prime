@@ -15,12 +15,12 @@ import urllib.request
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
 
-from MVP
+from player import Player
 
 
 ################################################################################
 URL_CSV = os.path.join(os.getcwd(), "data\\url.csv")
-OUTPUT_DIR = os.path.join(os.getcwd(), "results")
+OUTPUT_DIR = os.path.join(os.getcwd(), "mvp_results")
 
 
 ################################################################################
@@ -45,9 +45,13 @@ def get_player_urls():
 
 # collect data
 def run(url):
+    p = Player(url, OUTPUT_DIR)
+
     # get stats
+    p.get_stats()
 
     # save plots
+    p.plot_results()
 
 
 ################################################################################

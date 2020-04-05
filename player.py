@@ -28,8 +28,9 @@ from constants import *
 
 ################################################################################
 class Player:
-    def __init__(self, url):
+    def __init__(self, url, output_dir):
         self.url = url
+        self.output_dir = output_dir
         with urllib.request.urlopen(self.url) as response:
             page = response.read()
 
@@ -68,12 +69,13 @@ class Player:
     def get_name(self):
         name = self.soup.title.text.strip()
         name, _ = name.split("Stats")
+        name = name.replace("\\", "")
         name = name.strip()
         return name
 
     # create directory for player results
     def create_player_directory(self):
-        directory = os.path.join(OUTPUT_DIR, self.name)
+        directory = os.path.join(self.output_dir, self.name)
         if not os.path.exists(directory):
             os.makedirs(directory)
 
