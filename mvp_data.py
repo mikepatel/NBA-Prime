@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 import urllib.request
 from bs4 import BeautifulSoup
+from multiprocessing import Pool, Queue
 
 from constants import *
 
@@ -132,6 +133,12 @@ class Player:
 
 
 ################################################################################
+def run(record):
+    p = Player(record)
+    return p.record
+
+
+################################################################################
 # Main
 if __name__ == "__main__":
     # Read in CSV
@@ -139,8 +146,16 @@ if __name__ == "__main__":
 
     # pass in row, receive back populated row
     # then rank rows
+    records = []
+    for index, row in df.iterrows():
+        records.append(row)
 
-    p = Player(df.iloc[0])
-    print(p.record)
+    processes = Pool(processes=len(records))
+    data = processes.map(run, records)
+    processes.close()
 
     # Write to CSV
+    mvp_df = pd.DataFrame(data)
+    mvp_df = mvp_df.sort_values(by=["HITP Index"], ascending=False)
+    mvp_results_csv = os.path.join(MVP_RESULTS_DIR, "mvp_results.csv")
+    mvp_df.to_csv(mvp_results_csv, index=False)

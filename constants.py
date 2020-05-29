@@ -21,3 +21,4 @@ PLAYERS_CSV = os.path.join(os.getcwd(), "data\\players list.csv")  # input
 OUTPUT_DIR = os.path.join(os.getcwd(), "Results")  # output
 
 MVP_CSV = os.path.join(os.getcwd(), "data\\mvp.csv")
+MVP_RESULTS_DIR = os.path.join(os.getcwd(), "mvp_results")
