@@ -33,7 +33,7 @@ What is LeBron James' Prime? Check the table below to find out!
 |2013-14|29 |MIA |27.1  |6.9     |6.3    |0.75 |0.61 |29.3|0.649|0.4727 |
 
 
-### Preliminary ranking of MVP winners since 2000
+### Preliminary ranking of MVP winners since 2000 by HITP Index values
 (2012 season was shortened)
 | Year | Name                  | HITP Index | 
 |------|-----------------------|------------| 
