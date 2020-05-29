@@ -12,6 +12,7 @@ File description:
 # Imports
 import os
 import re
+import numpy as np
 import pandas as pd
 import urllib.request
 from bs4 import BeautifulSoup
@@ -42,12 +43,11 @@ class Player:
         self.assists = self.get_assists()
         self.team = self.get_team()
         self.team_wins = self.get_team_wins()
+        self.memorability = int(self.record["Memorability"])
+        self.hitp_index = self.calculate_hitp_index()
 
         # populate record
-        self.record["Points"] = self.points
-        self.record["Rebounds"] = self.rebounds
-        self.record["Assists"] = self.assists
-        self.record["Wins"] = self.team_wins
+        self.populate_record()
 
     # get name
     def get_name(self):
@@ -66,16 +66,19 @@ class Player:
     # get points
     def get_points(self):
         points = self.row.find("td", {"data-stat": "pts_per_g"}).text.strip()
+        points = float(points)
         return points
 
     # get rebounds
     def get_rebounds(self):
         rebounds = self.row.find("td", {"data-stat": "trb_per_g"}).text.strip()
+        rebounds = float(rebounds)
         return rebounds
 
     # get assists
     def get_assists(self):
         assists = self.row.find("td", {"data-stat": "ast_per_g"}).text.strip()
+        assists = float(assists)
         return assists
 
     # get TS%
@@ -98,9 +101,34 @@ class Player:
         wins_soup = BeautifulSoup(page, "html.parser")
 
         wins = wins_soup.find("td", {"data-stat": "wins"}).text.strip()
+        wins = int(wins)
         return wins
 
     # calculate HITP index
+    def calculate_hitp_index(self):
+        # weights
+        w_pts = 1
+        w_rebs = 1
+        w_asts = 1
+        w_wins = 1
+        w_memorability = 0
+
+        hitp_index = np.sum([
+            w_pts*self.points,
+            w_rebs*self.rebounds,
+            w_asts*self.assists,
+            w_wins*self.team_wins,
+            w_memorability*self.memorability
+        ])
+        return hitp_index
+
+    # populate record
+    def populate_record(self):
+        self.record["Points"] = self.points
+        self.record["Rebounds"] = self.rebounds
+        self.record["Assists"] = self.assists
+        self.record["Wins"] = self.team_wins
+        self.record["HITP Index"] = self.hitp_index
 
 
 ################################################################################
