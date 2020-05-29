@@ -21,8 +21,9 @@ from constants import *
 
 ################################################################################
 class Player:
-    def __init__(self, url):
+    def __init__(self, url, year):
         self.url = url
+        self.year = year
         with urllib.request.urlopen(self.url) as response:
             page = response.read()
 
@@ -31,8 +32,10 @@ class Player:
         # html soup
         self.soup = BeautifulSoup(page, "html.parser")
 
-        # get player name
+        # get player info
         self.name = self.get_name()
+        self.row = self.get_row()
+        self.points = self.get_points()
 
     # get name
     def get_name(self):
@@ -42,6 +45,18 @@ class Player:
         name = name.strip()
         return name
 
+    # get specific mvp row
+    def get_row(self):
+        xpath = '//*[@id="per_game.' + str(self.year) + '"]'
+        x = "per_game." + str(self.year)
+        row = self.soup.find("tr", {'id': x})
+        return row
+
+    # get points
+    def get_points(self):
+        points = self.row.find("td", {'data-stat': 'pts_per_g'}).text.strip()
+        return points
+
 
 ################################################################################
 # Main
@@ -49,10 +64,11 @@ if __name__ == "__main__":
     # Read in CSV
     df = pd.read_csv(MVP_CSV)
 
-    url_list = df["URL"]
-    url = url_list[0]
+    years = df["Year"]
+    urls = df["URL"]
 
-    p = Player(url)
+    p = Player(urls[0], years[0])
     print(p.name)
+    print(p.points)
 
     # Write to CSV
