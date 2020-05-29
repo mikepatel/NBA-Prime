@@ -1,15 +1,21 @@
-Name,URL
-Shaquille O'Neal,https://www.basketball-reference.com/players/o/onealsh01.html
-Allen Iverson,https://www.basketball-reference.com/players/i/iversal01.html
-Tim Duncan,https://www.basketball-reference.com/players/d/duncati01.html
-Kevin Garnett,https://www.basketball-reference.com/players/g/garneke01.html
-Steve Nash,https://www.basketball-reference.com/players/n/nashst01.html
-Dirk Nowitzki,https://www.basketball-reference.com/players/n/nowitdi01.html
-Kobe Bryant,https://www.basketball-reference.com/players/b/bryanko01.html
-LeBron James,https://www.basketball-reference.com/players/j/jamesle01.html
-Derrick Rose,https://www.basketball-reference.com/players/r/rosede01.html
-Kevin Durant,https://www.basketball-reference.com/players/d/duranke01.html
-Stephen Curry,https://www.basketball-reference.com/players/c/curryst01.html
-Russell Westbrook,https://www.basketball-reference.com/players/w/westbru01.html
-James Harden,https://www.basketball-reference.com/players/h/hardeja01.html
-Giannis Antetokounmpo,https://www.basketball-reference.com/players/a/antetgi01.html
+Year,Name,URL,Point,Rebounds,Assists,TS,Wins,Memorability
+2000,Shaquille O'Neal,https://www.basketball-reference.com/players/o/onealsh01.html,,,,,,1
+2001,Allen Iverson,https://www.basketball-reference.com/players/i/iversal01.html,,,,,,3
+2002,Tim Duncan,https://www.basketball-reference.com/players/d/duncati01.html,,,,,,2
+2003,Tim Duncan,https://www.basketball-reference.com/players/d/duncati01.html,,,,,,2
+2004,Kevin Garnett,https://www.basketball-reference.com/players/g/garneke01.html,,,,,,1
+2005,Steve Nash,https://www.basketball-reference.com/players/n/nashst01.html,,,,,,1
+2006,Steve Nash,https://www.basketball-reference.com/players/n/nashst01.html,,,,,,1
+2007,Dirk Nowitzki,https://www.basketball-reference.com/players/n/nowitdi01.html,,,,,,3
+2008,Kobe Bryant,https://www.basketball-reference.com/players/b/bryanko01.html,,,,,,1
+2009,LeBron James,https://www.basketball-reference.com/players/j/jamesle01.html,,,,,,3
+2010,LeBron James,https://www.basketball-reference.com/players/j/jamesle01.html,,,,,,3
+2011,Derrick Rose,https://www.basketball-reference.com/players/r/rosede01.html,,,,,,3
+2012,LeBron James,https://www.basketball-reference.com/players/j/jamesle01.html,,,,,,2
+2013,LeBron James,https://www.basketball-reference.com/players/j/jamesle01.html,,,,,,3
+2014,Kevin Durant,https://www.basketball-reference.com/players/d/duranke01.html,,,,,,2
+2015,Stephen Curry,https://www.basketball-reference.com/players/c/curryst01.html,,,,,,2
+2016,Stephen Curry,https://www.basketball-reference.com/players/c/curryst01.html,,,,,,3
+2017,Russell Westbrook,https://www.basketball-reference.com/players/w/westbru01.html,,,,,,1
+2018,James Harden,https://www.basketball-reference.com/players/h/hardeja01.html,,,,,,2
+2019,Giannis Antetokounmpo,https://www.basketball-reference.com/players/a/antetgi01.html,,,,,,2
