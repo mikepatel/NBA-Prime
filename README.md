@@ -17,9 +17,7 @@ $ python model.py
 ```
 
 ## Results
-* Visualization Coming Soon!
-* Preliminary results can be found in [Results](https://github.com/mikepatel/NBA-Prime/tree/master/Results)
-
+### LeBron James
 LeBron James Career Stats
 ![LBJ Raw Stats](https://github.com/mikepatel/NBA-Prime/blob/master/Results/LeBron%20James/LeBron%20James_Plots_Raw.png)
 
