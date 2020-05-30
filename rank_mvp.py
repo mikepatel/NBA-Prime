@@ -48,11 +48,11 @@ if __name__ == "__main__":
 
     # Calculate HITP index
     # weights
-    w_pts = 1
-    w_rebs = 1
-    w_asts = 1
+    w_pts = 0.7
+    w_rebs = 0.5
+    w_asts = 0.5
     w_wins = 1
-    w_memorability = 0
+    w_memorability = 1
 
     for index, row in norm_df.iterrows():
         hitp_index = np.sum([
