@@ -34,7 +34,8 @@ What is LeBron James' Prime? Check the table below to find out!
 
 
 ### Preliminary ranking of MVP winners since 2000 by HITP Index values
-(2012 season was shortened)| Year | Name                  | HITP Index | Points | Rebounds | Assists | Wins | 
+(2012 season was shortened)
+| Year | Name                  | HITP Index | Points | Rebounds | Assists | Wins | 
 |------|-----------------------|------------|--------|----------|---------|------| 
 | 2000 | Shaquille O'Neal      | 2.6595     | 29.7   | 13.6     | 3.8     | 67   | 
 | 2017 | Russell Westbrook     | 2.5751     | 31.6   | 10.7     | 10.4    | 47   | 
@@ -56,4 +57,5 @@ What is LeBron James' Prime? Check the table below to find out!
 | 2001 | Allen Iverson         | 1.5112     | 31.1   | 3.8      | 4.6     | 56   | 
 | 2012 | LeBron James          | 1.4827     | 27.1   | 7.9      | 6.2     | 46   | 
 | 2006 | Steve Nash            | 1.4577     | 18.8   | 4.2      | 10.5    | 54   | 
+
 
