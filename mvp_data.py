@@ -156,4 +156,4 @@ if __name__ == "__main__":
 
     # Write to CSV
     mvp_df = pd.DataFrame(data)
-    mvp_df.to_csv(MVP_CSV , index=False)
+    mvp_df.to_csv(MVP_CSV, index=False)
