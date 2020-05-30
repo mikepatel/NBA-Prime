@@ -11,11 +11,6 @@
 * Using a variety of statistical metrics provided by Basketball Reference and NBA Stats
 * Created and calculated a custom statistic called **M_VALUE** to measure an NBA player's prime
 
-## Instructions
-```
-$ python model.py
-```
-
 ## Results
 ### LeBron James
 LeBron James Career Stats
