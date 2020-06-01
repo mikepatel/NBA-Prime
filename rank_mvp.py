@@ -53,6 +53,7 @@ if __name__ == "__main__":
     w_asts = 0.5
     w_wins = 1
     w_memorability = 1
+    w_another = 1
 
     for index, row in norm_df.iterrows():
         hitp_index = np.sum([
@@ -60,8 +61,11 @@ if __name__ == "__main__":
             w_rebs*row["Rebounds"],
             w_asts*row["Assists"],
             w_wins*row["Wins"],
-            w_memorability*row["Memorability"]
+            w_memorability*row["Memorability"],
+            w_another*row["Another"]
         ])
+
+        hitp_index = np.round(hitp_index, decimals=4)
 
         df.loc[index, "HITP Index"] = hitp_index
 
