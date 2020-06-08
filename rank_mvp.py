@@ -12,6 +12,7 @@ File description:
 # Imports
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from constants import *
 
@@ -72,3 +73,20 @@ if __name__ == "__main__":
     # Write to CSV
     df = df.sort_values(by="HITP Index", ascending=False)
     df.to_csv(MVP_RESULTS_CSV, index=False)
+
+    # Plot results
+    chart_df = df.sort_values("HITP Index", ascending=False)
+    x_labels = []
+    for index, row in chart_df.iterrows():
+        label = str(row["Name"]) + " " + str(row["Year"])
+        x_labels.append(label)
+
+    # colour bars differently
+    # linspace, len
+
+    plt.bar(x_labels, chart_df["HITP Index"])
+    plt.title("21st Century MVPs")
+    plt.xlabel("MVP")
+    plt.xticks(rotation=30, horizontalalignment="right")
+    plt.ylabel("HITP Index")
+    plt.show()
