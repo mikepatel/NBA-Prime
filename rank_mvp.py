@@ -83,10 +83,16 @@ if __name__ == "__main__":
 
     # colour bars differently
     # linspace, len
-
+    plt.figure(figsize=(20, 10))
     plt.bar(x_labels, chart_df["HITP Index"])
     plt.title("21st Century MVPs")
     plt.xlabel("MVP")
     plt.xticks(rotation=30, horizontalalignment="right")
     plt.ylabel("HITP Index")
-    plt.show()
+    plt.gcf().subplots_adjust(bottom=0.2)
+
+    # save plot
+    plot_filename = "mvp_plot.png"
+    plot_file = os.path.join(os.getcwd(), "mvp_results\\" + plot_filename)
+    plt.savefig(plot_file)
+    plt.close()
