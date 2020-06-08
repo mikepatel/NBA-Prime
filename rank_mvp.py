@@ -13,6 +13,7 @@ File description:
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 from constants import *
 
@@ -82,9 +83,11 @@ if __name__ == "__main__":
         x_labels.append(label)
 
     # colour bars differently
-    # linspace, len
+    colours = cm.rainbow(np.linspace(0, 1, len(x_labels)))
+
+    # build plot
     plt.figure(figsize=(20, 10))
-    plt.bar(x_labels, chart_df["HITP Index"])
+    plt.bar(x_labels, chart_df["HITP Index"], color=colours)
     plt.title("21st Century MVPs")
     plt.xlabel("MVP")
     plt.xticks(rotation=30, horizontalalignment="right")
