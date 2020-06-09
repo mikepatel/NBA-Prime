@@ -88,12 +88,13 @@ if __name__ == "__main__":
     # build plot
     plt.style.use("dark_background")
     plt.figure(figsize=(20, 10))
-    plt.bar(x_labels, chart_df["HITP Index"], color=colours)
+    plt.bar(x_labels, chart_df["HITP Index"], color=colours, zorder=2)
     plt.title("21st Century MVPs")
     plt.xlabel("MVP")
     plt.xticks(rotation=30, horizontalalignment="right")
     plt.ylabel("HITP Index")
     plt.gcf().subplots_adjust(bottom=0.2)
+    plt.grid(axis="y", linewidth=0.3)
 
     # save plot
     plot_filename = "mvp_plot.png"
