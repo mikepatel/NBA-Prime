@@ -86,6 +86,7 @@ if __name__ == "__main__":
     colours = cm.rainbow(np.linspace(0, 1, len(x_labels)))
 
     # build plot
+    plt.style.use("dark_background")
     plt.figure(figsize=(20, 10))
     plt.bar(x_labels, chart_df["HITP Index"], color=colours)
     plt.title("21st Century MVPs")
