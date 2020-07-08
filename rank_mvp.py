@@ -72,8 +72,8 @@ if __name__ == "__main__":
         df.loc[index, "HITP Index"] = hitp_index
 
     # Write to CSV
-    df = df.sort_values(by="HITP Index", ascending=False)
-    df.to_csv(MVP_RESULTS_CSV, index=False)
+    #df = df.sort_values(by="HITP Index", ascending=False)
+    df.to_csv(MVP_UNRANKED_CSV, index=False)
 
     # Plot results
     chart_df = df.sort_values("HITP Index", ascending=False)
