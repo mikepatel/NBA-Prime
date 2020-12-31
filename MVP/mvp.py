@@ -75,6 +75,7 @@ def plot_bar(csv_filepath, sort, save_dir, filename):
     ax.bar(xlabels, df["HITP"], color=colours)
     ax.set_title("21st Century NBA MVPs")
     ax.set_xticklabels(xlabels, rotation=30, horizontalalignment="right")
+    ax.set_ylabel("HITP")
 
     for i in range(len(df)):
         ax.annotate(f'{df.loc[i, "HITP"]}', (i-0.3, df.loc[i, "HITP"]+0.01))
