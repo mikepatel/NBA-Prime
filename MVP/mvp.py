@@ -13,7 +13,8 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+import matplotlib.cm as cm
+import matplotlib.animation as animation
 
 
 ################################################################################
@@ -47,7 +48,41 @@ def calculate_hitp(data_row):
         w_another*data_row["Another"]
     ])
 
+    value = np.around(value, decimals=4)
     return value
+
+
+# plot racing bar chart by HITP
+def plot_racing_bar(csv_filepath, save_dir):
+    df = pd.read_csv(csv_filepath)
+    size_df = len(df)
+
+    plt.style.use("dark_background")
+    fig, ax = plt.subplots(figsize=(20, 15))
+    colours = cm.rainbow(np.linspace(0, 1, size_df))
+
+    def draw_chart(frame):
+        df = pd.read_csv(csv_filepath)
+        df = df.head(frame)
+        df["HITP"] = np.around(df["HITP"], decimals=4)
+
+        df["Rank"] = df["HITP"].rank(method="first")
+
+        # plot
+        ax.clear()
+        ax.barh(df["Rank"], df["HITP"], color=colours)
+        ax.set_title("21st Century NBA MVPs")
+        [spine.set_visible(False) for spine in ax.spines.values()]  # remove border around figure
+        ax.get_xaxis().set_visible(False)  # hide x-axis
+        ax.get_yaxis().set_visible(False)  # hide y-axis
+
+        for index, row in df.iterrows():
+            ax.text(x=0, y=row["Rank"], s=str(row["Year"]) + " " + row["Name"], ha="right", va="center")  # base axis
+            ax.text(x=row["HITP"], y=row["Rank"], s=str(row["HITP"]), ha="left", va="center")
+
+    gif_filepath = os.path.join(save_dir, "racing_bar_mvp.gif")
+    animator = animation.FuncAnimation(fig, draw_chart, frames=len(df), interval=1500)
+    animator.save(gif_filepath, writer="imagemagick")
 
 
 ################################################################################
@@ -82,6 +117,10 @@ if __name__ == "__main__":
     mvp_df.to_csv(output_csv_filepath)
 
     # print out rankings
-    print(mvp_df.sort_values("HITP", ascending=False))
+    #print(mvp_df.sort_values("HITP", ascending=False))
 
     # create racing bar chart
+    plot_racing_bar(
+        csv_filepath=output_csv_filepath,
+        save_dir=RESULTS_DIR
+    )
