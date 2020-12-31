@@ -36,8 +36,8 @@ def calculate_hitp(data_row):
     w_rebs = 1.0
     w_asts = 1.0
     w_wins = 1.0
-    w_mem = 1.0
-    w_another = 1.0
+    w_mem = 1.5
+    w_another = 0.5
 
     value = np.sum([
         w_pts*data_row["Points"],
@@ -151,12 +151,10 @@ if __name__ == "__main__":
     #print(mvp_df.sort_values("HITP", ascending=False))
 
     # create racing bar chart
-    """
     plot_racing_bar(
         csv_filepath=output_csv_filepath,
         save_dir=RESULTS_DIR
     )
-    """
 
     # create bar chart
     plot_bar(
