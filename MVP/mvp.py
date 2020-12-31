@@ -52,7 +52,38 @@ def calculate_hitp(data_row):
     return value
 
 
-# plot racing bar chart by HITP
+# plot bar chart of HITP
+def plot_bar(csv_filepath, sort, save_dir, filename):
+    df = pd.read_csv(csv_filepath)
+
+    plt.style.use("dark_background")
+    fig, ax = plt.subplots(figsize=(20, 15))
+
+    colours = cm.rainbow(np.linspace(0, 1, len(df)))
+
+    if sort:
+        df = df.sort_values("HITP", ascending=False, ignore_index=True)
+
+    xlabels = []
+    for index, row in df.iterrows():
+        label = row["Name"] + " " + str(row["Year"])
+        xlabels.append(label)
+
+    df["HITP"] = np.around(df["HITP"], decimals=4)
+
+    ax.clear()
+    ax.bar(xlabels, df["HITP"], color=colours)
+    ax.set_title("21st Century NBA MVPs")
+    ax.set_xticklabels(xlabels, rotation=30, horizontalalignment="right")
+
+    for i in range(len(df)):
+        ax.annotate(f'{df.loc[i, "HITP"]}', (i-0.3, df.loc[i, "HITP"]+0.01))
+
+    filepath = os.path.join(save_dir, filename)
+    plt.savefig(filepath)
+
+
+# plot racing bar chart of HITP
 def plot_racing_bar(csv_filepath, save_dir):
     df = pd.read_csv(csv_filepath)
     size_df = len(df)
@@ -120,7 +151,25 @@ if __name__ == "__main__":
     #print(mvp_df.sort_values("HITP", ascending=False))
 
     # create racing bar chart
+    """
     plot_racing_bar(
         csv_filepath=output_csv_filepath,
         save_dir=RESULTS_DIR
+    )
+    """
+
+    # create bar chart
+    plot_bar(
+        csv_filepath=output_csv_filepath,
+        sort=False,
+        save_dir=RESULTS_DIR,
+        filename="bar_mvp"
+    )
+
+    # create sorted bar chart
+    plot_bar(
+        csv_filepath=output_csv_filepath,
+        sort=True,
+        save_dir=RESULTS_DIR,
+        filename="sorted_bar_mvp"
     )
