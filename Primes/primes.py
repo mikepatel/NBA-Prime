@@ -13,20 +13,7 @@ File description:
 """
 ################################################################################
 # Imports
-import os
-import sys
-import argparse
-import numpy as np
-import pandas as pd
-import seaborn as sns
-from multiprocessing import Pool
-
-
-################################################################################
-# directories
-PRIMES_DIR = os.path.join(os.getcwd(), "Primes")
-DATA_DIR = os.path.join(PRIMES_DIR, "data")
-RESULTS = os.path.join(PRIMES_DIR, "results")
+from packages import *   # for Python packages and global directories
 
 
 ################################################################################
@@ -97,11 +84,10 @@ if __name__ == "__main__":
 
     # select which csv to use
     data_filepath = get_data_filepath(args)  # get data csv filepath
-    #print(data_filename)
 
     # MULTIPROCESSING WORK: FOR EACH PLAYER
     player_urls = get_player_urls(data_filepath)
-    #print(player_urls)
+
     processes = Pool(processes=len(player_urls))
     processes.map(run, player_urls)
     processes.close()
