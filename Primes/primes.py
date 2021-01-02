@@ -47,19 +47,46 @@ def get_arguments():
         return arguments
 
 
-# get data csv filename based on CLI arguments
-def get_data_filename(arguments):
+# get data csv filepath based on CLI arguments
+def get_data_filepath(arguments):
     if arguments.current:
         filename = "current_players.csv"
-        return filename
+        filepath = os.path.join(DATA_DIR, filename)
+        return filepath
 
     elif arguments.legacy:
         filename = "legacy_players.csv"
-        return filename
+        filepath = os.path.join(DATA_DIR, filename)
+        return filepath
 
     else:
         print(f'\nPlease provide an argument:')
         sys.exit(1)
+
+
+# get list of player URLs
+def get_player_urls(csv_filepath):
+    df = pd.read_csv(csv_filepath)
+    urls = list(df["Basketball Reference URL"])
+    return urls
+
+
+################################################################################
+# run multiprocessing work: For each player, collect stats, calculate values, generate charts
+def run(url):
+    print(url)
+
+    # For each player, scrape Basketball Reference and create a csv with raw stats
+
+    # For each player, for each season, calculate M_VALUE
+
+    # For each player, calculate n-year prime using M_VALUES
+
+    # For each player, create a 3x3 plot of their stats
+    # Points, Rebounds, Assists
+    # Games
+    # FT%, PER, TS%, eFG%
+    # M_VALUE
 
 
 ################################################################################
@@ -69,25 +96,15 @@ if __name__ == "__main__":
     args = get_arguments()
 
     # select which csv to use
-    data_filename = get_data_filename(args)  # get data csv filename
+    data_filepath = get_data_filepath(args)  # get data csv filepath
     #print(data_filename)
 
     # MULTIPROCESSING WORK: FOR EACH PLAYER
-    # For each player, scrape Basketball Reference and create a csv with raw stats
-    # multiprocessing work
-
-    # For each player, for each season, calculate M_VALUE
-    # multiprocessing work
-
-    # For each player, calculate n-year prime using M_VALUES
-    # multiprocessing work
-
-    # For each player, create a 3x3 plot of their stats
-    # multiprocessing work
-    # Points, Rebounds, Assists
-    # Games
-    # FT%, PER, TS%, eFG%
-    # M_VALUE
+    player_urls = get_player_urls(data_filepath)
+    #print(player_urls)
+    processes = Pool(processes=len(player_urls))
+    processes.map(run, player_urls)
+    processes.close()
 
     # FOR CURRENT PLAYERS (2010-2020)
     if args.current:
