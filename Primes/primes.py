@@ -19,6 +19,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from multiprocessing import Pool
 
 
 ################################################################################
@@ -71,13 +72,18 @@ if __name__ == "__main__":
     data_filename = get_data_filename(args)  # get data csv filename
     #print(data_filename)
 
+    # MULTIPROCESSING WORK: FOR EACH PLAYER
     # For each player, scrape Basketball Reference and create a csv with raw stats
+    # multiprocessing work
 
     # For each player, for each season, calculate M_VALUE
+    # multiprocessing work
 
     # For each player, calculate n-year prime using M_VALUES
+    # multiprocessing work
 
     # For each player, create a 3x3 plot of their stats
+    # multiprocessing work
     # Points, Rebounds, Assists
     # Games
     # FT%, PER, TS%, eFG%
