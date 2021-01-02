@@ -29,30 +29,65 @@ RESULTS = os.path.join(PRIMES_DIR, "results")
 
 
 ################################################################################
-# get data csv filename based on CLI arguments
-def get_data_filename():
+# get CLI arguments
+def get_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--current", help="Analyze stats for current players (2010-2020)", action="store_true")
     parser.add_argument("--legacy", help="Analyze stats for retired players", action="store_true")
-    args = parser.parse_args()
+    arguments = parser.parse_args()
 
-    if args.current:
+    # check if there are any CLI arguments
+    if not arguments.current and not arguments.legacy:
+        print(f'\nPlease provide an argument:')
+        parser.print_help()
+        sys.exit(1)
+
+    else:
+        return arguments
+
+
+# get data csv filename based on CLI arguments
+def get_data_filename(arguments):
+    if arguments.current:
         filename = "current_players.csv"
         return filename
 
-    elif args.legacy:
+    elif arguments.legacy:
         filename = "legacy_players.csv"
         return filename
 
     else:
         print(f'\nPlease provide an argument:')
-        parser.print_help()
         sys.exit(1)
 
 
 ################################################################################
 # Main
 if __name__ == "__main__":
-    data_filename = get_data_filename()  # get data csv filename
+    # get CLI arguments
+    args = get_arguments()
+
+    # select which csv to use
+    data_filename = get_data_filename(args)  # get data csv filename
+    #print(data_filename)
+
+    # For each player, scrape Basketball Reference and create a csv with raw stats
+
+    # For each player, for each season, calculate M_VALUE
+
+    # For each player, calculate n-year prime using M_VALUES
+
+    # For each player, create a 3x3 plot of their stats
+    # Points, Rebounds, Assists
+    # Games
+    # FT%, PER, TS%, eFG%
+    # M_VALUE
+
+    # FOR CURRENT PLAYERS (2010-2020)
+    if args.current:
+        # Aggregate M_VALUES for all players for all seasons
+
+        # Create a heatmap for all players for all seasons based on M_VALUES
+        print("heatmap")
 
     quit()
