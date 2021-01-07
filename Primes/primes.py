@@ -61,7 +61,8 @@ def get_player_urls(csv_filepath):
 ################################################################################
 # run multiprocessing work: For each player, collect stats, calculate values, generate charts
 def run(url):
-    print(url)
+    p = Player(url)
+    #print(p.url)
 
     # For each player, scrape Basketball Reference and create a csv with raw stats
 
