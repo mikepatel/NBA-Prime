@@ -37,7 +37,9 @@ def get_arguments():
 # get data csv filepath based on CLI arguments
 def get_data_filepath(arguments):
     if arguments.current:
-        filename = "current_players.csv"
+        # ***** TEMP ***** #
+        filename = "test.csv"
+        #filename = "current_players.csv"
         filepath = os.path.join(DATA_DIR, filename)
         return filepath
 
@@ -62,7 +64,7 @@ def get_player_urls(csv_filepath):
 # run multiprocessing work: For each player, collect stats, calculate values, generate charts
 def run(url):
     p = Player(url)
-    #print(p.url)
+    print(p.url)
 
     # For each player, scrape Basketball Reference and create a csv with raw stats
 
