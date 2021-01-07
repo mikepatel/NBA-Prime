@@ -12,12 +12,15 @@ File description:
 ################################################################################
 # Imports
 import os
+import re
 import sys
 import argparse
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from multiprocessing import Pool
+import urllib3
+from bs4 import BeautifulSoup
 
 from player import Player
 
