@@ -32,6 +32,7 @@ class Player:
         self.norm_df = pd.DataFrame()
 
         # create a player directory
+        self.directory = self.create_player_directory()
 
         # for each season, calculate M_VALUE
 
@@ -56,3 +57,11 @@ class Player:
         name = name.replace("\\", "")
         name = name.strip()
         return name
+
+    # create a player directory
+    def create_player_directory(self):
+        directory = os.path.join(RESULTS_DIR, self.name)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        return directory

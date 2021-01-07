@@ -14,6 +14,7 @@ File description:
 ################################################################################
 # Imports
 from packages import *   # for Python packages and global directories
+from player import Player
 
 
 ################################################################################

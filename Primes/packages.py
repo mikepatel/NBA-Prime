@@ -22,11 +22,9 @@ from multiprocessing import Pool
 import urllib3
 from bs4 import BeautifulSoup
 
-from player import Player
-
 
 ################################################################################
 # directories
 PRIMES_DIR = os.path.join(os.getcwd(), "Primes")
 DATA_DIR = os.path.join(PRIMES_DIR, "data")
-RESULTS = os.path.join(PRIMES_DIR, "results")
+RESULTS_DIR = os.path.join(PRIMES_DIR, "results")
