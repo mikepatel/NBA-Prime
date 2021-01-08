@@ -26,15 +26,29 @@ class Player:
         self.name = self.get_name()
 
         # build a player df - raw stats
-        self.raw_df = pd.DataFrame()
+        self.raw_df = pd.DataFrame(columns=[
+            "Season",
+            "Age",
+            "Team",
+            "Points",
+            "Rebounds",
+            "Assists",
+            "FT%",
+            "eFG%",
+            "PER",
+            "TS%",
+            "M_VALUE"
+        ])
+
+        # scrape html soup for data
 
         # build a player df - normalized stats
         self.norm_df = pd.DataFrame()
 
+        # for each season, calculate M_VALUE
+
         # create a player directory
         self.directory = self.create_player_directory()
-
-        # for each season, calculate M_VALUE
 
         # create a 3x3 plot of their stats
 

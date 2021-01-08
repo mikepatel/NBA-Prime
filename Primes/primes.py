@@ -66,6 +66,7 @@ def get_player_urls(csv_filepath):
 def run(url):
     p = Player(url)
     print(p.name)
+    print(p.raw_df)
 
     # For each player, scrape Basketball Reference and create a csv with raw stats
 
