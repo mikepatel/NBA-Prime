@@ -26,19 +26,21 @@ class Player:
         self.name = self.get_name()
 
         # build a player df - raw stats
-        self.raw_df = pd.DataFrame(columns=[
-            "Season",
-            "Age",
-            "Team",
-            "Points",
-            "Rebounds",
-            "Assists",
-            "FT%",
-            "eFG%",
-            "PER",
-            "TS%",
-            "M_VALUE"
-        ])
+        self.raw_df = pd.DataFrame(
+            columns=[
+                "Season",
+                "Age",
+                "Team",
+                "Points",
+                "Rebounds",
+                "Assists",
+                "FT%",
+                "eFG%",
+                "PER",
+                "TS%",
+                "M_VALUE"
+            ]
+        )
 
         # scrape html soup for data
 
@@ -98,6 +100,7 @@ class Player:
 
         table_body = table.find("tbody")
         rows = table_body.find_all("tr")
+        rows = list(rows)
         return rows
 
     # ----- STATS ----- #
@@ -121,6 +124,20 @@ class Player:
 
     # get regular season - traditional - stats
     def get_regular_season_traditional_stats(self):
+        rows = self.get_rows(table_type="regular season traditional")
+
+        for i in range(len(rows)):
+            try:
+                # season
+                season = rows[i].find("th", {"data-stat": "season"})
+                season = season.a  # get URL
+                season = season.text.strip()
+                self.raw_df.loc[i, "Season"] = season
+
+            except AttributeError as ae:
+                if "attribute 'a'" in str(ae):  # 'Season' is not a hyperlink
+                    continue
 
     # get regular season - advanced - stats
     def get_regular_season_advanced_stats(self):
+        print()
