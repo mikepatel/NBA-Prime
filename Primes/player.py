@@ -47,6 +47,8 @@ class Player:
 
         # for each season, calculate M_VALUE
 
+        # calculate prime
+
         # create a player directory
         self.directory = self.create_player_directory()
 
@@ -54,6 +56,7 @@ class Player:
 
         # save CSV
 
+    # ----- HTML SOUP helper functions and SETUP ---- #
     # get html soup
     @staticmethod
     def get_html_soup(url):
@@ -79,3 +82,45 @@ class Player:
             os.makedirs(directory)
 
         return directory
+
+    # get table data rows
+    def get_rows(self, table_type):
+        if table_type == "regular season traditional":
+            table = self.soup.find("table", {"id": "per_game"})  # "Per Game" table --> Regular Season
+        elif table_type == "regular season advanced":
+            table = self.soup.find("table", {"id": "advanced"})  # find "Advanced" table
+        else:
+            print("\nCannot find table: {}".format(table_type))
+            sys.exit(1)
+
+        if table is None:
+            sys.exit(1)
+
+        table_body = table.find("tbody")
+        rows = table_body.find_all("tr")
+        return rows
+
+    # ----- STATS ----- #
+    # get regular season and playoff stats
+    def get_stats(self):
+        # regular season
+        self.get_regular_season_stats()
+
+        # playoffs
+
+    # ----- REGULAR SEASON STATS ----- #
+    # get regular season stats
+    def get_regular_season_stats(self):
+        # get regular season traditional stats
+        # traditional stats: Season, Age, Team, Points, Rebounds, Assists, FT%, eFG%
+        self.get_regular_season_traditional_stats()
+
+        # get regular season advanced stats
+        # advanced stats: PER, TS%
+        self.get_regular_season_advanced_stats()
+
+    # get regular season - traditional - stats
+    def get_regular_season_traditional_stats(self):
+
+    # get regular season - advanced - stats
+    def get_regular_season_advanced_stats(self):
