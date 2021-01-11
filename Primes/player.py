@@ -128,11 +128,15 @@ class Player:
 
         for i in range(len(rows)):
             try:
-                # season
+                # Season
                 season = rows[i].find("th", {"data-stat": "season"})
                 season = season.a  # get URL
                 season = season.text.strip()
                 self.raw_df.loc[i, "Season"] = season
+
+                # Age
+                age = rows[i].find("td", {"data-stat": "age"}).text.strip()  # int, not float
+                self.raw_df.loc[i, "Age"] = age
 
             except AttributeError as ae:
                 if "attribute 'a'" in str(ae):  # 'Season' is not a hyperlink
