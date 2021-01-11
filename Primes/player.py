@@ -138,6 +138,10 @@ class Player:
                 age = rows[i].find("td", {"data-stat": "age"}).text.strip()  # int, not float
                 self.raw_df.loc[i, "Age"] = age
 
+                # Team
+                team = rows[i].find("td", {"data-stat": "team_id"}).text.strip()  # str, not float
+                self.raw_df.loc[i, "Team"] = team
+
             except AttributeError as ae:
                 if "attribute 'a'" in str(ae):  # 'Season' is not a hyperlink
                     continue
