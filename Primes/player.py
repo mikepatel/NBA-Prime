@@ -103,6 +103,16 @@ class Player:
         rows = list(rows)
         return rows
 
+    # reads a particular stat value from html data
+    @staticmethod
+    def read_stat_from_table(row, feature):
+        try:
+            x = float(row.find("td", {"data-stat": feature}).text.strip())
+            return x
+        except AttributeError as e:
+            if "attribute 'text'" in str(e):
+                return float(0.0)
+
     # ----- STATS ----- #
     # get regular season and playoff stats
     def get_stats(self):
@@ -141,6 +151,14 @@ class Player:
                 # Team
                 team = rows[i].find("td", {"data-stat": "team_id"}).text.strip()  # str, not float
                 self.raw_df.loc[i, "Team"] = team
+
+                # Points
+                points = self.read_stat_from_table(rows[i], "pts_per_g")
+                self.raw_df.loc[i, "Points"] = points
+
+                # Rebounds
+
+                # Assists
 
             except AttributeError as ae:
                 if "attribute 'a'" in str(ae):  # 'Season' is not a hyperlink
