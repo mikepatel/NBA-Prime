@@ -138,25 +138,29 @@ class Player:
 
         for i in range(len(rows)):
             try:
+                row = rows[i]
+
                 # Season
-                season = rows[i].find("th", {"data-stat": "season"})
+                season = row.find("th", {"data-stat": "season"})
                 season = season.a  # get URL
                 season = season.text.strip()
                 self.raw_df.loc[i, "Season"] = season
 
                 # Age
-                age = rows[i].find("td", {"data-stat": "age"}).text.strip()  # int, not float
+                age = row.find("td", {"data-stat": "age"}).text.strip()  # int, not float
                 self.raw_df.loc[i, "Age"] = age
 
                 # Team
-                team = rows[i].find("td", {"data-stat": "team_id"}).text.strip()  # str, not float
+                team = row.find("td", {"data-stat": "team_id"}).text.strip()  # str, not float
                 self.raw_df.loc[i, "Team"] = team
 
                 # Points
-                points = self.read_stat_from_table(rows[i], "pts_per_g")
+                points = self.read_stat_from_table(row, "pts_per_g")
                 self.raw_df.loc[i, "Points"] = points
 
                 # Rebounds
+                rebounds = self.read_stat_from_table(row, "trb_per_g")
+                self.raw_df.loc[i, "Rebounds"] = rebounds
 
                 # Assists
 
