@@ -167,8 +167,12 @@ class Player:
                 self.raw_df.loc[i, "Assists"] = assists
 
                 # FT%
+                ft = self.read_stat_from_table(row, "ft_pct")
+                self.raw_df.loc[i, "FT%"] = ft
 
                 # eFG%
+                efg = self.read_stat_from_table(row, "efg_pct")
+                self.raw_df.loc[i, "eFG%"] = efg
 
             except AttributeError as ae:
                 if "attribute 'a'" in str(ae):  # 'Season' is not a hyperlink
