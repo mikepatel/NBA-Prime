@@ -69,9 +69,10 @@ def run(url):
 
     # For each player, scrape Basketball Reference and create a csv with raw stats
     p.get_stats()
-    print(p.raw_df)
 
     # For each player, for each season, calculate M_VALUE
+    p.calculate_m_value()
+    print(p.raw_df)
 
     # For each player, calculate n-year prime using M_VALUES
 
@@ -80,6 +81,8 @@ def run(url):
     # Games
     # FT%, PER, TS%, eFG%
     # M_VALUE
+
+    # save CSV
 
 
 ################################################################################

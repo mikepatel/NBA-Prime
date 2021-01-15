@@ -42,21 +42,8 @@ class Player:
             ]
         )
 
-        # scrape html soup for data
-
-        # build a player df - normalized stats
-        self.norm_df = pd.DataFrame()
-
-        # for each season, calculate M_VALUE
-
-        # calculate prime
-
         # create a player directory
         self.directory = self.create_player_directory()
-
-        # create a 3x3 plot of their stats
-
-        # save CSV
 
     # ----- HTML SOUP helper functions and SETUP ---- #
     # get html soup
@@ -196,3 +183,15 @@ class Player:
 
             except AttributeError as ae:
                 continue
+
+    # ----- M_VALUE ----- #
+    # normalize stats df
+    def normalize(self, df):
+        normalized_df = pd.DataFrame()
+
+        return normalized_df
+
+    # calculate M_VALUE for each season
+    def calculate_m_value(self):
+        # normalize stats first
+        norm_df = self.normalize(self.raw_df)
