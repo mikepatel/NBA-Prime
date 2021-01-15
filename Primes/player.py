@@ -186,8 +186,30 @@ class Player:
 
     # ----- M_VALUE ----- #
     # normalize stats df
-    def normalize(self, df):
-        normalized_df = pd.DataFrame()
+    @staticmethod
+    def normalize(df):
+        normalized_df = df.copy()
+
+        for c in df.columns:
+            # does not make sense to normalize: Season, Age, Team
+            if c == "Season" or c == "Age" or c == "Team":
+                normalized_df[c] = df[c]
+
+            else:
+                min_value = df[c].min()  # min
+                max_value = df[c].max()  # max
+
+                numerator = df[c] - min_value
+                denominator = max_value - min_value
+
+                # check if denomator is 0
+                if denominator == 0.0:
+                    normalized_df[c] = df[c]
+
+                else:
+                    normalized_value = numerator / denominator
+                    normalized_df[c] = normalized_value
+                    normalized_df[c] = normalized_df[c].apply(lambda x: round(x, 4))
 
         return normalized_df
 
