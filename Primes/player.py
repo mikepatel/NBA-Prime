@@ -209,7 +209,7 @@ class Player:
                 else:
                     normalized_value = numerator / denominator
                     normalized_df[c] = normalized_value
-                    normalized_df[c] = normalized_df[c].apply(lambda x: round(x, 4))
+                    #normalized_df[c] = normalized_df[c].apply(lambda x: round(x, 4))
 
         return normalized_df
 
@@ -217,3 +217,27 @@ class Player:
     def calculate_m_value(self):
         # normalize stats first
         norm_df = self.normalize(self.raw_df)
+
+        # weights
+        w_pts = 0.1  # points
+        w_reb = 0.1  # rebounds
+        w_ast = 0.1  # assists
+        w_ftp = 0.1  # FT%
+        w_efg = 0.1  # eFG%
+        w_per = 0.1  # PER
+        w_tsp = 0.1  # TS%
+
+        # calculate M_VALUE for each season
+        for index, row in norm_df.iterrows():
+            m_value = np.sum([
+                w_pts * row["Points"],
+                w_reb * row["Rebounds"],
+                w_ast * row["Assists"],
+                w_ftp * row["FT%"],
+                w_efg * row["eFG%"],
+                w_per * row["PER"],
+                w_tsp * row["TS%"]
+            ])
+
+            m_value = np.round(m_value, decimals=4)
+            self.raw_df.loc[index, "M_VALUE"] = m_value
