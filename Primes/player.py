@@ -282,3 +282,10 @@ class Player:
         filepath = os.path.join(self.directory, filename)
         plt.savefig(filepath)
         plt.close()
+
+    # ----- CSV ----- #
+    # save output dataframe to csv
+    def save_df(self):
+        filename = self.name + "_stats.csv"
+        filepath = os.path.join(self.directory, filename)
+        self.raw_df.to_csv(filepath, index=None)
