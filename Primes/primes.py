@@ -77,11 +77,7 @@ def run(url):
     #p.find_prime()
     print(p.raw_df)
 
-    # For each player, create a 3x3 plot of their stats, using Seaborn package
-    # Points, Rebounds, Assists
-    # Games
-    # FT%, PER, TS%, eFG%
-    # M_VALUE
+    # For each player, create a 3x3 plot of their stats
     p.plot_stats()
 
     # save CSV

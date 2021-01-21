@@ -252,6 +252,10 @@ class Player:
         print()
 
     # ----- PLOTS ----- #
+    # For each player, create a 3x3 plot of their stats
+    # Games, Points, Rebounds,
+    # Assists, FT%, PER,
+    # TS%, eFG%, # M_VALUE
     def plot_stats(self):
         #plt.style.use("dark_background")
         plt.figure(figsize=(20, 10))
