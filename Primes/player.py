@@ -31,6 +31,7 @@ class Player:
                 "Season",
                 "Age",
                 "Team",
+                "Games",
                 "Points",
                 "Rebounds",
                 "Assists",
@@ -141,6 +142,10 @@ class Player:
                 team = row.find("td", {"data-stat": "team_id"}).text.strip()  # str, not float
                 self.raw_df.loc[i, "Team"] = team
 
+                # Games
+                games = self.read_stat_from_table(row, "g")
+                self.raw_df.loc[i, "Games"] = games
+
                 # Points
                 points = self.read_stat_from_table(row, "pts_per_g")
                 self.raw_df.loc[i, "Points"] = points
@@ -191,8 +196,8 @@ class Player:
         normalized_df = df.copy()
 
         for c in df.columns:
-            # does not make sense to normalize: Season, Age, Team
-            if c == "Season" or c == "Age" or c == "Team":
+            # does not make sense to normalize: Season, Age, Team, Games
+            if c == "Season" or c == "Age" or c == "Team" or c == "Games":
                 normalized_df[c] = df[c]
 
             else:
@@ -248,5 +253,28 @@ class Player:
 
     # ----- PLOTS ----- #
     def plot_stats(self):
-        # use seaborn package for plots
-        print()
+        #plt.style.use("dark_background")
+        plt.figure(figsize=(20, 10))
+        plt.suptitle(self.name)
+
+        subplot_idx = 1
+
+        for c in self.raw_df.columns:
+            if c == "Season" or c == "Age" or c == "Team":
+                continue
+
+            else:
+                plt.subplot(3, 3, subplot_idx)
+                plt.plot(self.raw_df["Season"], self.raw_df[c])
+                plt.title(c)
+                plt.xticks(rotation=45)
+                plt.grid()
+                plt.subplots_adjust(hspace=0.5)
+
+            subplot_idx += 1
+
+        # save plot
+        filename = self.name + "_plots.png"
+        filepath = os.path.join(self.directory, filename)
+        plt.savefig(filepath)
+        plt.close()
