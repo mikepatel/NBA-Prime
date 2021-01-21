@@ -72,15 +72,17 @@ def run(url):
 
     # For each player, for each season, calculate M_VALUE
     p.calculate_m_value()
-    print(p.raw_df)
 
     # For each player, calculate n-year prime using M_VALUES
+    #p.find_prime()
+    print(p.raw_df)
 
-    # For each player, create a 3x3 plot of their stats
+    # For each player, create a 3x3 plot of their stats, using Seaborn package
     # Points, Rebounds, Assists
     # Games
     # FT%, PER, TS%, eFG%
     # M_VALUE
+    p.plot_stats()
 
     # save CSV
 

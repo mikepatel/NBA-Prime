@@ -241,3 +241,12 @@ class Player:
 
             m_value = np.round(m_value, decimals=4)
             self.raw_df.loc[index, "M_VALUE"] = m_value
+
+    # ----- PRIME ----- #
+    def find_prime(self, window_size):
+        print()
+
+    # ----- PLOTS ----- #
+    def plot_stats(self):
+        # use seaborn package for plots
+        print()
