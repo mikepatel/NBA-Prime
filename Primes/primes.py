@@ -73,7 +73,6 @@ def run(url):
     p.calculate_m_value()
 
     # For each player, calculate n-year prime using M_VALUES
-    #print(p.raw_df)
     p.find_prime(window_size=3)
     #print(p.raw_df)
 
