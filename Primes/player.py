@@ -43,6 +43,9 @@ class Player:
             ]
         )
 
+        # prime df
+        self.prime_df = pd.DataFrame()
+
         # create a player directory
         self.directory = self.create_player_directory()
 
@@ -261,8 +264,7 @@ class Player:
                 avg = mean[index]
                 prime_idx = index
 
-        prime_df = self.raw_df[prime_idx-window_size+1:prime_idx+1]
-        return prime_df
+        self.prime_df = self.raw_df[prime_idx-window_size+1:prime_idx+1]
 
     # ----- PLOTS ----- #
     # For each player, create a 3x3 plot of their stats
@@ -299,6 +301,12 @@ class Player:
     # ----- CSV ----- #
     # save output dataframe to csv
     def save_df(self):
-        filename = self.name + "_stats.csv"
-        filepath = os.path.join(self.directory, filename)
-        self.raw_df.to_csv(filepath, index=None)
+        csvs = {
+            "_stats.csv": self.raw_df,
+            "_prime.csv": self.prime_df
+        }
+
+        for c in csvs:
+            filename = self.name + c
+            filepath = os.path.join(self.directory, filename)
+            csvs[c].to_csv(filepath, index=None)

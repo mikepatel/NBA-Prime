@@ -73,14 +73,14 @@ def run(url):
     p.calculate_m_value()
 
     # For each player, calculate n-year prime using M_VALUES
-    print(p.raw_df)
-    print(p.find_prime(window_size=3))
+    #print(p.raw_df)
+    p.find_prime(window_size=3)
 
     # For each player, create a 3x3 plot of their stats
-    #p.plot_stats()
+    p.plot_stats()
 
     # save dataframe to CSV
-    #p.save_df()
+    p.save_df()
 
 
 ################################################################################
