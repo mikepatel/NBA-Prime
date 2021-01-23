@@ -191,25 +191,6 @@ class Player:
         # drop incomplete rows
         self.raw_df = self.raw_df.dropna(how="all")
 
-    # get regular season - advanced - stats
-    def get_regular_season_advanced_stats(self):
-        rows = self.get_rows(table_type="regular season advanced")
-
-        for i in range(len(rows)):
-            try:
-                row = rows[i]
-
-                # PER
-                per = self.read_stat_from_table(row, "per")
-                self.raw_df.loc[i, "PER"] = per
-
-                # TS%
-                ts = self.read_stat_from_table(row, "ts_pct")
-                self.raw_df.loc[i, "TS%"] = ts
-
-            except AttributeError as ae:
-                continue
-
     # ----- M_VALUE ----- #
     # normalize stats df
     @staticmethod
