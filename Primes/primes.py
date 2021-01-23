@@ -65,7 +65,6 @@ def get_player_urls(csv_filepath):
 # run multiprocessing work: For each player, collect stats, calculate values, generate charts
 def run(url):
     p = Player(url)
-    print(p.name)
 
     # For each player, scrape Basketball Reference and create a csv with raw stats
     p.get_stats()
@@ -74,13 +73,15 @@ def run(url):
     p.calculate_m_value()
 
     # For each player, calculate n-year prime using M_VALUES
-    #p.find_prime()
+    print(p.raw_df)
+    print(p.find_prime(window_size=3))
 
     # For each player, create a 3x3 plot of their stats
-    p.plot_stats()
+    #p.plot_stats()
 
     # save dataframe to CSV
-    p.save_df()
+    #p.save_df()
+
 
 ################################################################################
 # Main

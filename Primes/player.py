@@ -249,7 +249,20 @@ class Player:
 
     # ----- PRIME ----- #
     def find_prime(self, window_size):
-        print()
+        avg = 0.0
+        prime_idx = 0
+
+        norm_df = self.normalize(self.raw_df)
+        var = norm_df["M_VALUE"].rolling(window=window_size).var()  # variance
+        mean = norm_df["M_VALUE"].rolling(window=window_size).mean()  # mean
+
+        for index, value in var.iteritems():
+            if mean[index] > avg:
+                avg = mean[index]
+                prime_idx = index
+
+        prime_df = self.raw_df[prime_idx-window_size+1:prime_idx+1]
+        return prime_df
 
     # ----- PLOTS ----- #
     # For each player, create a 3x3 plot of their stats
