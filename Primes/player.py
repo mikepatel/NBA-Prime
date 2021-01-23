@@ -116,7 +116,7 @@ class Player:
     # ----- REGULAR SEASON STATS ----- #
     # get regular season stats
     def get_regular_season_stats(self):
-        # traditional stats: Season, Age, Team, Points, Rebounds, Assists, FT%, eFG%
+        # traditional stats: Season, Age, Team, Games, Points, Rebounds, Assists, FT%, eFG%
         # advanced stats: PER, TS%
         rows_trad = self.get_rows(table_type="regular season traditional")
         rows_adv = self.get_rows(table_type="regular season advanced")
