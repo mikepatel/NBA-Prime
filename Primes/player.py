@@ -39,7 +39,8 @@ class Player:
                 "eFG%",
                 "PER",
                 "TS%",
-                "M_VALUE"
+                "M_VALUE",
+                "Prime"
             ]
         )
 
@@ -175,6 +176,8 @@ class Player:
                     ts = self.read_stat_from_table(r_a, "ts_pct")
                     self.raw_df.loc[i, "TS%"] = ts
 
+                    j += 1
+
                 else:
                     for c in self.raw_df.columns:
                         self.raw_df.loc[i, c] = np.nan
@@ -214,8 +217,8 @@ class Player:
         normalized_df = df.copy()
 
         for c in df.columns:
-            # does not make sense to normalize: Season, Age, Team, Games
-            if c == "Season" or c == "Age" or c == "Team" or c == "Games":
+            # does not make sense to normalize: Season, Age, Team, Games, Prime
+            if c == "Season" or c == "Age" or c == "Team" or c == "Games" or c == "Prime":
                 normalized_df[c] = df[c]
 
             else:
@@ -279,7 +282,8 @@ class Player:
                 avg = mean[index]
                 prime_idx = index
 
-        self.prime_df = self.raw_df[prime_idx-window_size+1:prime_idx+1]
+        self.raw_df.loc[prime_idx - window_size + 1:prime_idx, "Prime"] = "Yes"  # inclusive selection
+        self.prime_df = self.raw_df.loc[self.raw_df["Prime"] == "Yes"]
 
     # ----- PLOTS ----- #
     # For each player, create a 3x3 plot of their stats
@@ -294,7 +298,7 @@ class Player:
         subplot_idx = 1
 
         for c in self.raw_df.columns:
-            if c == "Season" or c == "Age" or c == "Team":
+            if c == "Season" or c == "Age" or c == "Team" or c == "Prime":
                 continue
 
             else:
