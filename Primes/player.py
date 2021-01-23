@@ -115,63 +115,78 @@ class Player:
     # ----- REGULAR SEASON STATS ----- #
     # get regular season stats
     def get_regular_season_stats(self):
-        # get regular season traditional stats
         # traditional stats: Season, Age, Team, Points, Rebounds, Assists, FT%, eFG%
-        self.get_regular_season_traditional_stats()
-
-        # get regular season advanced stats
         # advanced stats: PER, TS%
-        self.get_regular_season_advanced_stats()
+        rows_trad = self.get_rows(table_type="regular season traditional")
+        rows_adv = self.get_rows(table_type="regular season advanced")
 
-    # get regular season - traditional - stats
-    def get_regular_season_traditional_stats(self):
-        rows = self.get_rows(table_type="regular season traditional")
+        # counter for iterating through advanced stats table
+        j = 0
 
-        for i in range(len(rows)):
+        for i in range(len(rows_trad)):
             try:
-                row = rows[i]
+                r_t = rows_trad[i]
+                r_a = rows_adv[j]
 
                 # Season
-                season = row.find("th", {"data-stat": "season"})
-                season = season.a  # get URL
-                season = season.text.strip()
-                self.raw_df.loc[i, "Season"] = season
+                season = r_t.find("th", {"data-stat": "season"})
+                if season is not None:
+                    season = season.a  # get URL
+                    season = season.text.strip()
+                    self.raw_df.loc[i, "Season"] = season
 
-                # Age
-                age = row.find("td", {"data-stat": "age"}).text.strip()  # int, not float
-                self.raw_df.loc[i, "Age"] = age
+                    # Age
+                    age = r_t.find("td", {"data-stat": "age"}).text.strip()  # int, not float
+                    self.raw_df.loc[i, "Age"] = age
 
-                # Team
-                team = row.find("td", {"data-stat": "team_id"}).text.strip()  # str, not float
-                self.raw_df.loc[i, "Team"] = team
+                    # Team
+                    team = r_t.find("td", {"data-stat": "team_id"}).text.strip()  # str, not float
+                    self.raw_df.loc[i, "Team"] = team
 
-                # Games
-                games = self.read_stat_from_table(row, "g")
-                self.raw_df.loc[i, "Games"] = games
+                    # Games
+                    games = self.read_stat_from_table(r_t, "g")
+                    self.raw_df.loc[i, "Games"] = games
 
-                # Points
-                points = self.read_stat_from_table(row, "pts_per_g")
-                self.raw_df.loc[i, "Points"] = points
+                    # Points
+                    points = self.read_stat_from_table(r_t, "pts_per_g")
+                    self.raw_df.loc[i, "Points"] = points
 
-                # Rebounds
-                rebounds = self.read_stat_from_table(row, "trb_per_g")
-                self.raw_df.loc[i, "Rebounds"] = rebounds
+                    # Rebounds
+                    rebounds = self.read_stat_from_table(r_t, "trb_per_g")
+                    self.raw_df.loc[i, "Rebounds"] = rebounds
 
-                # Assists
-                assists = self.read_stat_from_table(row, "ast_per_g")
-                self.raw_df.loc[i, "Assists"] = assists
+                    # Assists
+                    assists = self.read_stat_from_table(r_t, "ast_per_g")
+                    self.raw_df.loc[i, "Assists"] = assists
 
-                # FT%
-                ft = self.read_stat_from_table(row, "ft_pct")
-                self.raw_df.loc[i, "FT%"] = ft
+                    # FT%
+                    ft = self.read_stat_from_table(r_t, "ft_pct")
+                    self.raw_df.loc[i, "FT%"] = ft
 
-                # eFG%
-                efg = self.read_stat_from_table(row, "efg_pct")
-                self.raw_df.loc[i, "eFG%"] = efg
+                    # eFG%
+                    efg = self.read_stat_from_table(r_t, "efg_pct")
+                    self.raw_df.loc[i, "eFG%"] = efg
+
+                    # PER
+                    per = self.read_stat_from_table(r_a, "per")
+                    self.raw_df.loc[i, "PER"] = per
+
+                    # TS%
+                    ts = self.read_stat_from_table(r_a, "ts_pct")
+                    self.raw_df.loc[i, "TS%"] = ts
+
+                else:
+                    for c in self.raw_df.columns:
+                        self.raw_df.loc[i, c] = np.nan
+
+                    j = i - 1
 
             except AttributeError as ae:
                 if "attribute 'a'" in str(ae):  # 'Season' is not a hyperlink
                     continue
+
+        # drop incomplete rows
+        self.raw_df = self.raw_df.dropna(how="all")
 
     # get regular season - advanced - stats
     def get_regular_season_advanced_stats(self):

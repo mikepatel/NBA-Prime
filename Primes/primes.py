@@ -40,7 +40,7 @@ def get_data_filepath(arguments):
     if arguments.current:
         # ***** TEMP ***** #
         filename = "test.csv"
-        #filename = "current_players.csv"
+        filename = "current_players.csv"
         filepath = os.path.join(DATA_DIR, filename)
         return filepath
 
@@ -75,6 +75,7 @@ def run(url):
     # For each player, calculate n-year prime using M_VALUES
     #print(p.raw_df)
     p.find_prime(window_size=3)
+    #print(p.raw_df)
 
     # For each player, create a 3x3 plot of their stats
     p.plot_stats()
