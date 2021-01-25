@@ -38,8 +38,7 @@ def get_arguments():
 # get data csv filepath based on CLI arguments
 def get_data_filepath(arguments):
     if arguments.current:
-        # ***** TEMP ***** #
-        filename = "test.csv"
+        #filename = "test.csv"
         filename = "current_players.csv"
         filepath = os.path.join(DATA_DIR, filename)
         return filepath
