@@ -14,7 +14,7 @@
 ## Results
 ### LeBron James
 LeBron James Career Stats
-![LBJ Raw Stats](https://github.com/mikepatel/NBA-Prime/blob/master/Results/LeBron%20James/LeBron%20James_Plots_Raw.png)
+![LBJ Raw Stats](https://github.com/mikepatel/NBA-Prime/blob/master/Primes/results/LeBron%20James/LeBron%20James_plots.png)
 
 
 What is LeBron James' Prime? Check the table below to find out!
@@ -29,29 +29,30 @@ What is LeBron James' Prime? Check the table below to find out!
 ### Preliminary ranking of MVP winners since 2000 by HITP Index values
 (2012 season was shortened)
 
-![MVP gif](https://github.com/mikepatel/NBA-Prime/blob/master/mvp_results/rank.gif)
-![MVP rankings](https://github.com/mikepatel/NBA-Prime/blob/master/mvp_results/mvp_plot.png)
+![MVP gif](https://github.com/mikepatel/NBA-Prime/blob/master/MVP/results/racing_bar_mvp.gif)
+![MVP rankings](https://github.com/mikepatel/NBA-Prime/blob/master/MVP/results/sorted_bar_mvp.png)
 
-| Year | Name                  | HITP Index | Points | Rebounds | Assists | Wins | 
-|------|-----------------------|------------|--------|----------|---------|------| 
-| 2016 | Stephen Curry         | 3.9221     | 30.1   | 5.4      | 6.7     | 73   | 
-| 2009 | LeBron James          | 3.7254     | 28.4   | 7.6      | 7.2     | 66   | 
-| 2013 | LeBron James          | 3.6825     | 26.8   | 8        | 7.3     | 66   | 
-| 2011 | Derrick Rose          | 3.2989     | 25     | 4.1      | 7.7     | 62   | 
-| 2018 | James Harden          | 3.2682     | 30.4   | 5.4      | 8.8     | 65   | 
-| 2014 | Kevin Durant          | 3.2546     | 32     | 7.4      | 5.5     | 59   | 
-| 2007 | Dirk Nowitzki         | 3.178      | 24.6   | 8.9      | 3.4     | 67   | 
-| 2000 | Shaquille O'Neal      | 3.1408     | 29.7   | 13.6     | 3.8     | 67   | 
-| 2001 | Allen Iverson         | 3.1299     | 31.1   | 3.8      | 4.6     | 56   | 
-| 2019 | Giannis Antetokounmpo | 3.1243     | 27.7   | 12.5     | 5.9     | 60   | 
-| 2015 | Stephen Curry         | 2.9425     | 23.8   | 4.3      | 7.7     | 67   | 
-| 2010 | LeBron James          | 2.9177     | 29.7   | 7.3      | 8.6     | 61   | 
-| 2003 | Tim Duncan            | 2.5831     | 23.3   | 12.9     | 3.9     | 60   | 
-| 2002 | Tim Duncan            | 2.5806     | 25.5   | 12.7     | 3.7     | 58   | 
-| 2004 | Kevin Garnett         | 2.4123     | 24.2   | 13.9     | 5       | 58   | 
-| 2012 | LeBron James          | 2.3819     | 27.1   | 7.9      | 6.2     | 46   | 
-| 2017 | Russell Westbrook     | 2.2512     | 31.6   | 10.7     | 10.4    | 47   | 
-| 2008 | Kobe Bryant           | 1.2154     | 28.3   | 6.3      | 5.4     | 57   | 
-| 2005 | Steve Nash            | 1.0926     | 15.5   | 3.3      | 11.5    | 62   | 
-| 2006 | Steve Nash            | 0.917      | 18.8   | 4.2      | 10.5    | 54   | 
+| Year | Name                  | Points | Rebounds | Assists | HITP   | 
+|------|-----------------------|--------|----------|---------|--------| 
+| 2020 | Giannis Antetokounmpo | 29.5   | 13.6     | 5.6     | 2.7035 | 
+| 2000 | Shaquille O'Neal      | 29.7   | 13.6     | 3.8     | 2.6509 | 
+| 2017 | Russell Westbrook     | 31.6   | 10.7     | 10.4    | 2.5381 | 
+| 2016 | Stephen Curry         | 30.1   | 5.4      | 6.7     | 2.4904 | 
+| 2018 | James Harden          | 30.4   | 5.4      | 8.8     | 2.4601 | 
+| 2010 | LeBron James          | 29.7   | 7.3      | 8.6     | 2.4184 | 
+| 2019 | Giannis Antetokounmpo | 27.7   | 12.5     | 5.9     | 2.416  | 
+| 2009 | LeBron James          | 28.4   | 7.6      | 7.2     | 2.3874 | 
+| 2013 | LeBron James          | 26.8   | 8        | 7.3     | 2.3405 | 
+| 2004 | Kevin Garnett         | 24.2   | 13.9     | 5       | 2.1479 | 
+| 2014 | Kevin Durant          | 32     | 7.4      | 5.5     | 2.1076 | 
+| 2002 | Tim Duncan            | 25.5   | 12.7     | 3.7     | 1.953  | 
+| 2003 | Tim Duncan            | 23.3   | 12.9     | 3.9     | 1.9401 | 
+| 2015 | Stephen Curry         | 23.8   | 4.3      | 7.7     | 1.8975 | 
+| 2012 | LeBron James          | 27.1   | 7.9      | 6.2     | 1.8731 | 
+| 2007 | Dirk Nowitzki         | 24.6   | 8.9      | 3.4     | 1.849  | 
+| 2011 | Derrick Rose          | 25     | 4.1      | 7.7     | 1.759  | 
+| 2008 | Kobe Bryant           | 28.3   | 6.3      | 5.4     | 1.6903 | 
+| 2005 | Steve Nash            | 15.5   | 3.3      | 11.5    | 1.5769 | 
+| 2001 | Allen Iverson         | 31.1   | 3.8      | 4.6     | 1.4869 | 
+| 2006 | Steve Nash            | 18.8   | 4.2      | 10.5    | 1.4307 | 
 
