@@ -101,8 +101,43 @@ if __name__ == "__main__":
     # FOR CURRENT PLAYERS (2010-2020)
     if args.current:
         # Aggregate M_VALUES for all players for all seasons
+        heat_df = pd.DataFrame(columns=[
+            "Player",
+            "2010-11",
+            "2011-12",
+            "2012-13",
+            "2013-14",
+            "2014-15",
+            "2015-16",
+            "2016-17",
+            "2017-18",
+            "2018-19",
+            "2019-20"
+        ])
+
+        dirs = os.listdir(RESULTS_DIR)  # names
+        for i in range(len(dirs)):
+            d = dirs[i]
+            filepath = os.path.join(RESULTS_DIR, d)
+            filepath = os.path.join(filepath, d+"_stats.csv")
+            df = pd.read_csv(filepath)
+
+            heat_df.loc[i, "Player"] = d
+
+            for c in heat_df.columns:
+                if c == "Player":
+                    continue
+                else:
+                    try:
+                        m = df.loc[df["Season"] == c, ["M_VALUE"]]
+                        heat_df.loc[i, c] = m.values[0][0]
+                    except IndexError:
+                        continue  # NaN
+
+        print(heat_df)
+        print(heat_df.drop(columns=["Player"]))
+        #ax = sns.heatmap(heat_df.drop(columns=["Player"]), annot=True)
 
         # Create a heatmap for all players for all seasons based on M_VALUES
-        print("heatmap")
 
     quit()
