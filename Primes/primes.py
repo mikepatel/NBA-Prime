@@ -117,15 +117,14 @@ if __name__ == "__main__":
             "2016-17",
             "2017-18",
             "2018-19",
-            "2019-20"
+            "2019-20",
+            "2020-21"
         ]
-        num_seasons = len(seasons)
 
         dirs = os.listdir(RESULTS_DIR)  # names
-        num_dirs = len(dirs)
 
         xs = []
-        for i in range(num_dirs):
+        for i in range(len(dirs)):
             d = dirs[i]
             filepath = os.path.join(RESULTS_DIR, d)
             filepath = os.path.join(filepath, d + "_stats.csv")
@@ -146,7 +145,12 @@ if __name__ == "__main__":
         # Create a heatmap for all players for all seasons based on M_VALUES
         heat_df = pd.pivot_table(heat_df, values="M_VALUE", index=["Player"], columns=["Season"])
 
-        sns.heatmap(heat_df, annot=True)
-        plt.show()
+        plt.style.use("dark_background")
+        plt.figure(figsize=(20, 15))
+        plt.title("NBA Primes 2010-Present")
+        cmap = "YlOrRd"
+        sns.heatmap(heat_df, annot=True, cmap=cmap)
 
-    quit()
+        heatmap_filename = "heatmap"
+        heatmap_filepath = os.path.join(PRIMES_DIR, heatmap_filename)
+        plt.savefig(heatmap_filepath)
