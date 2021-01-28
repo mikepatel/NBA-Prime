@@ -103,6 +103,11 @@ if __name__ == "__main__":
         # Aggregate M_VALUES for all players for all seasons
         heat_df = pd.DataFrame(columns=[
             "Player",
+            "Season",
+            "M_VALUE"
+        ])
+
+        seasons = [
             "2010-11",
             "2011-12",
             "2012-13",
@@ -113,31 +118,35 @@ if __name__ == "__main__":
             "2017-18",
             "2018-19",
             "2019-20"
-        ])
+        ]
+        num_seasons = len(seasons)
 
         dirs = os.listdir(RESULTS_DIR)  # names
-        for i in range(len(dirs)):
+        num_dirs = len(dirs)
+
+        xs = []
+        for i in range(num_dirs):
             d = dirs[i]
             filepath = os.path.join(RESULTS_DIR, d)
-            filepath = os.path.join(filepath, d+"_stats.csv")
+            filepath = os.path.join(filepath, d + "_stats.csv")
             df = pd.read_csv(filepath)
 
-            heat_df.loc[i, "Player"] = d
+            for index, row in df.iterrows():
+                if row["Season"] in seasons:
+                    x = {
+                        "Player": d,
+                        "Season": row["Season"],
+                        "M_VALUE": row["M_VALUE"]
+                    }
 
-            for c in heat_df.columns:
-                if c == "Player":
-                    continue
-                else:
-                    try:
-                        m = df.loc[df["Season"] == c, ["M_VALUE"]]
-                        heat_df.loc[i, c] = m.values[0][0]
-                    except IndexError:
-                        continue  # NaN
+                    xs.append(x)
 
-        print(heat_df)
-        print(heat_df.drop(columns=["Player"]))
-        #ax = sns.heatmap(heat_df.drop(columns=["Player"]), annot=True)
+        heat_df = pd.DataFrame(xs, columns=["Player", "Season", "M_VALUE"])
 
         # Create a heatmap for all players for all seasons based on M_VALUES
+        heat_df = pd.pivot_table(heat_df, values="M_VALUE", index=["Player"], columns=["Season"])
+
+        sns.heatmap(heat_df, annot=True)
+        plt.show()
 
     quit()
