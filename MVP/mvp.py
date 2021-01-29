@@ -36,8 +36,8 @@ def calculate_hitp(data_row):
     w_rebs = 1.0
     w_asts = 1.0
     w_wins = 1.0
-    w_mem = 1.5
-    w_another = 0.5
+    w_mem = 1.0
+    w_another = 1.0
 
     value = np.sum([
         w_pts*data_row["Points"],
