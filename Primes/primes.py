@@ -85,7 +85,7 @@ def run(url):
 ################################################################################
 # create a heatmap
 def generate_heatmap():
-    # Aggregate M_VALUES for all players for all seasons
+    # aggregate M_VALUES for all players for all seasons
     seasons = [
         "2010-11",
         "2011-12",
@@ -103,13 +103,13 @@ def generate_heatmap():
     dirs = os.listdir(RESULTS_DIR)  # names
 
     xs = []
-    for i in range(len(dirs)):
+    for i in range(len(dirs)):  # iterate through players
         d = dirs[i]
         filepath = os.path.join(RESULTS_DIR, d)
         filepath = os.path.join(filepath, d + "_stats.csv")
         df = pd.read_csv(filepath)
 
-        for index, row in df.iterrows():
+        for index, row in df.iterrows():  # iterate through player's df
             if row["Season"] in seasons:
                 x = {
                     "Player": d,
@@ -119,18 +119,21 @@ def generate_heatmap():
 
                 xs.append(x)
 
+    # create a new df
     heat_df = pd.DataFrame(xs, columns=["Player", "Season", "M_VALUE"])
 
-    # Create a heatmap for all players for all seasons based on M_VALUES
+    # restructure the df
     heat_df = pd.pivot_table(heat_df, values="M_VALUE", index=["Player"], columns=["Season"])
     # print(heat_df)
 
+    # plot heatmap
     plt.style.use("dark_background")
     plt.figure(figsize=(20, 15))
     plt.title("NBA Primes 2010-Present")
     cmap = "YlOrRd"
     sns.heatmap(heat_df, annot=True, cmap=cmap)
 
+    # save heatmap
     heatmap_filename = "heatmap"
     heatmap_filepath = os.path.join(PRIMES_DIR, heatmap_filename)
     plt.savefig(heatmap_filepath)
