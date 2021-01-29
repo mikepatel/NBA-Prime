@@ -32,27 +32,5 @@ What is LeBron James' Prime? Check the table below to find out!
 ![MVP gif](https://github.com/mikepatel/NBA-Prime/blob/master/MVP/results/racing_bar_mvp.gif)
 ![MVP rankings](https://github.com/mikepatel/NBA-Prime/blob/master/MVP/results/sorted_bar_mvp.png)
 
-| Year | Name                  | Points | Rebounds | Assists | HITP   | 
-|------|-----------------------|--------|----------|---------|--------| 
-| 2020 | Giannis Antetokounmpo | 29.5   | 13.6     | 5.6     | 2.7035 | 
-| 2000 | Shaquille O'Neal      | 29.7   | 13.6     | 3.8     | 2.6509 | 
-| 2017 | Russell Westbrook     | 31.6   | 10.7     | 10.4    | 2.5381 | 
-| 2016 | Stephen Curry         | 30.1   | 5.4      | 6.7     | 2.4904 | 
-| 2018 | James Harden          | 30.4   | 5.4      | 8.8     | 2.4601 | 
-| 2010 | LeBron James          | 29.7   | 7.3      | 8.6     | 2.4184 | 
-| 2019 | Giannis Antetokounmpo | 27.7   | 12.5     | 5.9     | 2.416  | 
-| 2009 | LeBron James          | 28.4   | 7.6      | 7.2     | 2.3874 | 
-| 2013 | LeBron James          | 26.8   | 8        | 7.3     | 2.3405 | 
-| 2004 | Kevin Garnett         | 24.2   | 13.9     | 5       | 2.1479 | 
-| 2014 | Kevin Durant          | 32     | 7.4      | 5.5     | 2.1076 | 
-| 2002 | Tim Duncan            | 25.5   | 12.7     | 3.7     | 1.953  | 
-| 2003 | Tim Duncan            | 23.3   | 12.9     | 3.9     | 1.9401 | 
-| 2015 | Stephen Curry         | 23.8   | 4.3      | 7.7     | 1.8975 | 
-| 2012 | LeBron James          | 27.1   | 7.9      | 6.2     | 1.8731 | 
-| 2007 | Dirk Nowitzki         | 24.6   | 8.9      | 3.4     | 1.849  | 
-| 2011 | Derrick Rose          | 25     | 4.1      | 7.7     | 1.759  | 
-| 2008 | Kobe Bryant           | 28.3   | 6.3      | 5.4     | 1.6903 | 
-| 2005 | Steve Nash            | 15.5   | 3.3      | 11.5    | 1.5769 | 
-| 2001 | Allen Iverson         | 31.1   | 3.8      | 4.6     | 1.4869 | 
-| 2006 | Steve Nash            | 18.8   | 4.2      | 10.5    | 1.4307 | 
+TO DO: add table of MVP data
 
