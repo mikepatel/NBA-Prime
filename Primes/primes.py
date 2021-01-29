@@ -155,8 +155,6 @@ if __name__ == "__main__":
     processes.map(run, player_urls)
     processes.close()
 
-    # FOR CURRENT PLAYERS (2010-2020)
+    # FOR CURRENT PLAYERS (2010-present)
     if args.current:
         generate_heatmap()
-
-
