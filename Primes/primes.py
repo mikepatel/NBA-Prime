@@ -86,12 +86,6 @@ def run(url):
 # create a heatmap
 def generate_heatmap():
     # Aggregate M_VALUES for all players for all seasons
-    heat_df = pd.DataFrame(columns=[
-        "Player",
-        "Season",
-        "M_VALUE"
-    ])
-
     seasons = [
         "2010-11",
         "2011-12",
