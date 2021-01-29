@@ -59,7 +59,7 @@ def plot_bar(csv_filepath, sort, save_dir, filename):
     plt.style.use("dark_background")
     fig, ax = plt.subplots(figsize=(20, 15))
 
-    colours = cm.rainbow(np.linspace(0, 1, len(df)))
+    colours = cm.gist_rainbow(np.linspace(0, 1, len(df)))
 
     if sort:
         df = df.sort_values("HITP", ascending=False, ignore_index=True)
@@ -91,7 +91,7 @@ def plot_racing_bar(csv_filepath, save_dir):
 
     plt.style.use("dark_background")
     fig, ax = plt.subplots(figsize=(20, 15))
-    colours = cm.rainbow(np.linspace(0, 1, size_df))
+    colours = cm.gist_rainbow(np.linspace(0, 1, size_df))
 
     def draw_chart(frame):
         df = pd.read_csv(csv_filepath)
