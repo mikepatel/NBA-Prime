@@ -29,5 +29,6 @@ What is LeBron James' Prime? Check the table below to find out!
 ### Preliminary ranking of MVP winners since 2000 by HITP
 (2012 season was shortened)\
 ![](https://github.com/mikepatel/NBA-Prime/blob/master/MVP/results/racing_bar_mvp.gif)
+![](https://github.com/mikepatel/NBA-Prime/blob/master/MVP/results/bar_mvp.png)
 ![](https://github.com/mikepatel/NBA-Prime/blob/master/MVP/results/sorted_bar_mvp.png)
 TO DO: add table of MVP data
