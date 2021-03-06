@@ -6,6 +6,7 @@
 <a href="https://soundcloud.com/engineers-play">
   <img src="https://i1.sndcdn.com/avatars-000446326572-ycrzp2-t500x500.jpg" alt="Hard in the Paint NBA Podcast Logo" width="300"/>
 </a>
+* Check out the full article on [Medium](https://michaelpatel.medium.com/discovering-nba-players-primes-8bd91895757d)
 
 ## Data
 * Using a variety of statistical metrics provided by Basketball Reference and NBA Stats
