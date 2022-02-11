@@ -25,7 +25,7 @@ window.addEventListener("DOMContentLoaded", function(){
     }
 
     // add listener to dropdown
-    document.getElementById("dropdown").addEventListener("click", updateImage);
+    dropdown.addEventListener("click", updateImage);
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
