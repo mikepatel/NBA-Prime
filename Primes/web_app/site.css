@@ -1,3 +1,8 @@
 img {
     max-width: 100%;
 }
+
+#dropdown {
+    justify-content: center;
+    padding: 1%;
+}
