@@ -10,8 +10,9 @@ players.set("Steph Curry", {"src": "images/Stephen Curry_plots.png"});
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // On load
 window.addEventListener("DOMContentLoaded", function(){
-    // populate dropdown
     const dropdown = document.getElementById("dropdown");
+    
+    // populate dropdown
     for(const [key, value] of players){
         let player_name = key;
 
