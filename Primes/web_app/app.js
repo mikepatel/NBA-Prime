@@ -2,22 +2,25 @@
 // create a mapping between player names and player plots
 let players = new Map();
 
-players.set("Giannis Antetokounmpo", {"src": "images/Giannis Antetokounmpo_plots.png"});
-players.set("Kevin Durant", {"src": "images/Kevin Durant_plots.png"});
-players.set("LeBron James", {"src": "images/LeBron James_plots.png"});
-players.set("Steph Curry", {"src": "images/Stephen Curry_plots.png"});
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // On load
 window.addEventListener("DOMContentLoaded", function(){
+    // populate 'players' map
+    players.set("Giannis Antetokounmpo", {"src": "images/Giannis Antetokounmpo_plots.png"});
+    players.set("Kevin Durant", {"src": "images/Kevin Durant_plots.png"});
+    players.set("LeBron James", {"src": "images/LeBron James_plots.png"});
+    players.set("Steph Curry", {"src": "images/Stephen Curry_plots.png"});
+
+    // get reference to 'dropdown' element
     const dropdown = document.getElementById("dropdown");
     
     // populate dropdown
     for(const [key, value] of players){
-        let player_name = key;
+        const player_name = key;
 
         // create a new option element
-        let element = document.createElement("option");
+        const element = document.createElement("option");
         element.textContent = player_name;
         element.value = player_name;
 
@@ -28,6 +31,7 @@ window.addEventListener("DOMContentLoaded", function(){
     // add listener to dropdown
     dropdown.addEventListener("click", updateImage);
 });
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // update the image based on the selected option in the dropdown
@@ -42,5 +46,6 @@ function updateImage(){
         image.setAttribute("alt", playerName);
     }    
 }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
